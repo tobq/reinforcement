@@ -23,6 +23,10 @@ application {
     mainClassName = "tobi.reinforcement.Main"
 }
 
+test {
+    useJUnitPlatform()
+}
+
 dependencies {
     implementation project(':gym')
     implementation 'org.jfree:jfreechart:1.5.0'
