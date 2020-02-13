@@ -7,8 +7,6 @@ import tobi.gym.util.BoxDiscreteEnvironment;
 import org.json.JSONException;
 import tobi.reinforcement.network.Network;
 
-import java.io.IOException;
-
 
 public class BoxDiscreteGym {
     private static final int ITERATIONS = 1000;
