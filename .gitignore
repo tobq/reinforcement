@@ -1,7 +1,4 @@
 build/
 .gradle/
-gradle/
 .idea/
-gradlew.bat
-gradlew
 15*.csv
