@@ -340,8 +340,7 @@ public class Network {
 
             // copy variable outputs
             final HashSet<Variable> outputs = new HashSet<>(this.varOutputs.get(neuron));
-//
-//            // TODO:>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> UNCOMMENT
+
             if (!(neuron instanceof Variable || neuron instanceof Constant)) {
                 if (Utils.shouldMutate(mutationRate)) {
                     // add existing var as output
@@ -354,7 +353,6 @@ public class Network {
                     if (outputs.size() != 0) outputs.remove(Utils.randomElement(outputs));
                 }
             }
-
 
             varOutputs.put(neuron, outputs);
         }
@@ -503,7 +501,9 @@ public class Network {
     public int countSynapses() {
 //        count var outputs
 //        count neuron inputs
-        return -1;
+//        TODO: Implement
+        throw new RuntimeException("UnImplemented");
+//        return -1;
     }
 
     public static Network crossover(Network a, Network b, double aFitness, double bFitness) {

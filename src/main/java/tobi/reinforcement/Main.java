@@ -2,6 +2,7 @@ package tobi.reinforcement;
 
 import tobi.reinforcement.network.Network;
 import tobi.reinforcement.problems.gym.BoxBoxGym;
+import tobi.reinforcement.problems.gym.BoxDiscreteGym;
 import tobi.reinforcement.problems.gym.DiscreteBoxGym;
 
 import java.io.*;
@@ -18,11 +19,11 @@ public class Main {
 //        private static final Problem PROBLEM = new Square();
 //    private static final Problem PROBLEM = new EqualsProblem(1);
     public static final double MUTATION_RATE = 0.1;
-    public static final int GENERATION_SIZE = 500;
+    public static final int GENERATION_SIZE = 10;
     //    public static final int GENERATION_SIZE = 10000;
-    private static final double PARENT_RATIO = 0.2;
+    private static final double PARENT_RATIO = 0.1;
     public static final int PARENT_COUNT = (int) Math.ceil(GENERATION_SIZE * PARENT_RATIO);
-    public static final long MAX_GENERATION_COUNT = 999999999;
+    public static final long MAX_GENERATION_COUNT = Long.MAX_VALUE;
     private static final boolean ASEXUAL_REPRODUCTION = false;
     private static final boolean COPY_CROSSOVERS = true;
     private static final boolean CLONE_PARENTS = true;
@@ -59,11 +60,15 @@ public class Main {
      * Open Ai Gym used to extend problem set
      * - more generic problems, compare with other existing algorithms
      * - more complicated problems
+     * <p>
+     * implemented my own GYM wrapper
+     * - implemented threading
      */
     public static void main(String... args) throws InterruptedException, IOException, URISyntaxException, ExecutionException {
-
 //        final BoxDiscreteGym PROBLEM = new BoxDiscreteGym("MemorizeDigits-v0");
-        try (BoxBoxGym PROBLEM = new BoxBoxGym("LunarLanderContinuous-v2")) {
+//        try (BoxBoxGym PROBLEM = new BoxBoxGym("BipedalWalker-v2")) {
+        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("Pong-ram-v0")) {
+//        try (BoxBoxGym PROBLEM = new BoxBoxGym("LunarLanderContinuous-v2")) {
 //        try (DiscreteBoxGym PROBLEM = new DiscreteBoxGym("HotterColder-v0")) {
 //        try (DiscreteDiscreteGym PROBLEM = new DiscreteDiscreteGym("FrozenLake-v0")) {
 //        try (BoxBoxGym PROBLEM = new BoxBoxGym("CarRacing-v0")) {
@@ -76,8 +81,6 @@ public class Main {
 //        chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
 //        JFrame jFrame = new JFrame();
 //        jFrame.setContentPane(chartPanel);
-
-
             String[] CONFIG = {
                     "PROBLEM = " + PROBLEM.toString(),
                     "MUTATION_RATE = " + MUTATION_RATE,
@@ -91,12 +94,10 @@ public class Main {
                     "VARIABLE_ENVIRONMENT = " + VARIABLE_ENVIRONMENT
             };
             try (PrintWriter fileWriter = new PrintWriter(new FileWriter(System.currentTimeMillis() + ".csv"))) {
-
                 for (String setting : CONFIG) {
                     System.out.println(setting);
                     fileWriter.println("#" + setting);
                 }
-
 
                 int inputCount = PROBLEM.getInstanceLength();
                 int outputCount = PROBLEM.getLabelLength();
@@ -111,26 +112,21 @@ public class Main {
                 for (int g = 0; g < MAX_GENERATION_COUNT; g++) {
                     double[] fitnesses = new double[generation.length];
 
-                    ArrayList<Callable<Double>> tasks = new ArrayList<Callable<Double>>();
+                    ArrayList<Callable<Double>> tasks = new ArrayList<>();
                     for (Network network : generation) {
                         int finalSeed = seed;
-                        tasks.add(() -> PROBLEM.test(network, false, finalSeed));
+                        tasks.add(() -> PROBLEM.test(network, false, /*1,*/ finalSeed));
                         //                tasks.add(() -> PROBLEM.test(network));
                     }
                     List<Future<Double>> invokeAll = exec.invokeAll(tasks);
                     for (int i = 0; i < invokeAll.size(); i++) {
                         fitnesses[i] = invokeAll.get(i).get();
                     }
-                    //            for (int i = 0; i < GENERATION_SIZE; i++) {
-                    //                fitnesses[i] = PROBLEM.test(generation[i]);
-                    //            }
-
 
                     Integer[] order = new Integer[generation.length];
                     for (int i = 0; i < generation.length; i++) order[i] = i;
 
                     Network[] finalGeneration = generation;
-
                     Comparator<Integer> c;
                     switch (SORT_METHOD) {
                         case LOG_SORT:
@@ -154,21 +150,13 @@ public class Main {
                     Arrays.sort(order, c);
 
                     int fittestIndex = order[0];
-
                     double maxFitness = fitnesses[fittestIndex];
                     Network fittestNetwork = generation[fittestIndex];
                     int networkSize = fittestNetwork.getNeurons().size();
                     String networkString = fittestNetwork.serialise();
                     System.out.println(g + ": BEST FITNESS = " + maxFitness + "\t\tNode count = " + networkSize + "\t\t" + networkString);
                     fileWriter.println(maxFitness + "," + networkSize + "," + networkString);
-                    //            System.out.println("WORST FITNESS = " + fitnesses[indices[GENERATION_SIZE - 1]]);
-                    //            System.out.println("AVG FITNESS = " + Arrays.stream(fitnesses).average().getAsDouble());
 
-
-                    //            System.out.print("ORDERED FITNESSES: ");
-                    //            for (int i = 0; i < GENERATION_SIZE; i++) System.out.print(fitnesses[order[i]] + ", ");
-                    //            System.out.println();
-                    //
                     final Network[] nextGen = new Network[generation.length];
                     if (CLONE_PARENTS) {
                         for (int i = 0; i < PARENT_COUNT; i++)
@@ -191,14 +179,11 @@ public class Main {
                         }
                     }
                     generation = nextGen;
-
-
+                    if (VARIABLE_ENVIRONMENT) seed = random.nextPositiveInt();
                     //            SwingUtilities.invokeLater(() -> showGraph(nextGen[0]));
-
                     //            plotChart(chartPanel, fittestNetwork, GOAL_FUNC);
                     //            jFrame.pack();
                     //            jFrame.setVisible(true);
-                    if (VARIABLE_ENVIRONMENT) seed = random.nextPositiveInt();
                 }
             }
         }
