@@ -71,7 +71,7 @@ public class Utils {
     }
 
     public static double logRandom(double min, double max) {
-        return logRandom(min, max, 100);
+        return logRandom(min, max, 1000);
     }
 
     public static double logRandom(double max) {
