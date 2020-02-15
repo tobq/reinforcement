@@ -19,7 +19,7 @@ public class Main {
 //        private static final Problem PROBLEM = new Square();
 //    private static final Problem PROBLEM = new EqualsProblem(1);
     public static final double MUTATION_RATE = 0.1;
-    public static final int GENERATION_SIZE = 10;
+    public static final int GENERATION_SIZE = 1000;
     //    public static final int GENERATION_SIZE = 10000;
     private static final double PARENT_RATIO = 0.1;
     public static final int PARENT_COUNT = (int) Math.ceil(GENERATION_SIZE * PARENT_RATIO);
@@ -66,8 +66,9 @@ public class Main {
      */
     public static void main(String... args) throws InterruptedException, IOException, URISyntaxException, ExecutionException {
 //        final BoxDiscreteGym PROBLEM = new BoxDiscreteGym("MemorizeDigits-v0");
-//        try (BoxBoxGym PROBLEM = new BoxBoxGym("BipedalWalker-v2")) {
-        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("Pong-ram-v0")) {
+        try (BoxBoxGym PROBLEM = new BoxBoxGym("BipedalWalker-v2")) {
+//        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("Pong-ram-v0")) {
+//        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("CartPole-v1")) {
 //        try (BoxBoxGym PROBLEM = new BoxBoxGym("LunarLanderContinuous-v2")) {
 //        try (DiscreteBoxGym PROBLEM = new DiscreteBoxGym("HotterColder-v0")) {
 //        try (DiscreteDiscreteGym PROBLEM = new DiscreteDiscreteGym("FrozenLake-v0")) {
