@@ -25,6 +25,15 @@ public abstract class Gym<O extends SpaceInstance, A extends SpaceInstance> impl
         }
     }
 
+    public Gym(String envId, String pythonExecutable) throws InterruptedException, IOException, URISyntaxException {
+        this.envId = envId;
+        this.gym = new tobi.gym.Gym(pythonExecutable);
+        try (Environment<O, A> env = generateEnv(envId)) {
+            instanceLength = getInstanceLength(env);
+            labelLength = getLabelLength(env);
+        }
+    }
+
     public double test(Network network, boolean render, int seed) throws InterruptedException, IOException {
         return test(network, render, ITERATIONS, seed);
     }

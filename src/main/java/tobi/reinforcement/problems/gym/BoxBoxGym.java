@@ -12,6 +12,10 @@ public class BoxBoxGym extends Gym<Box, Box> {
         super(envId);
     }
 
+    public BoxBoxGym(String envId, String pythonExecutable) throws InterruptedException, IOException, URISyntaxException {
+        super(envId, pythonExecutable);
+    }
+
     @Override
     protected int getLabelLength(Environment<Box, Box> env) {
         return ((BoxBoxEnvironment) env).getActionSpace().getArraySize();
