@@ -25,11 +25,11 @@ public abstract class Gym<O extends SpaceInstance, A extends SpaceInstance> impl
         }
     }
 
-    public double test(Network network, boolean render, int seed) throws InterruptedException {
+    public double test(Network network, boolean render, int seed) throws InterruptedException, IOException {
         return test(network, render, ITERATIONS, seed);
     }
 
-    public double test(Network network, boolean render, int iterations, int seed) throws InterruptedException {
+    public double test(Network network, boolean render, int iterations, int seed) throws InterruptedException, IOException {
         double rewards = 0;
         try (Environment<O, A> env = generateEnv(envId, render)) {
             O observation = env.reset();
@@ -60,11 +60,11 @@ public abstract class Gym<O extends SpaceInstance, A extends SpaceInstance> impl
 
     protected abstract int getInstanceLength(Environment<O, A> env);
 
-    protected Environment<O, A> generateEnv(String envId) {
+    protected Environment<O, A> generateEnv(String envId) throws IOException {
         return generateEnv(envId, false);
     }
 
-    protected abstract Environment<O, A> generateEnv(String envId, boolean render);
+    protected abstract Environment<O, A> generateEnv(String envId, boolean render) throws IOException;
 
     protected abstract A formatAction(double[] actions);
 

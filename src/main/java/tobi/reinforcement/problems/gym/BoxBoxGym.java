@@ -23,7 +23,7 @@ public class BoxBoxGym extends Gym<Box, Box> {
     }
 
     @Override
-    protected Environment<Box, Box> generateEnv(String envId, boolean render) {
+    protected Environment<Box, Box> generateEnv(String envId, boolean render) throws IOException {
         return new BoxBoxEnvironment(envId, render, gym);
     }
 

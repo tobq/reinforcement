@@ -24,7 +24,7 @@ public class DiscreteDiscreteGym extends Gym<Discrete, Discrete> {
     }
 
     @Override
-    protected DiscreteDiscreteEnvironment generateEnv(String envId, boolean render) {
+    protected DiscreteDiscreteEnvironment generateEnv(String envId, boolean render) throws IOException {
         return new DiscreteDiscreteEnvironment(envId, render, gym);
     }
 
