@@ -66,7 +66,8 @@ public class Main {
      */
     public static void main(String... args) throws InterruptedException, IOException, URISyntaxException, ExecutionException {
 //        final BoxDiscreteGym PROBLEM = new BoxDiscreteGym("MemorizeDigits-v0");
-        try (BoxBoxGym PROBLEM = args.length < 1 ? new BoxBoxGym("BipedalWalker-v2") : new BoxBoxGym("BipedalWalker-v2", args[0])) {
+        final String envId = "BipedalWalker-v3";
+        try (BoxBoxGym PROBLEM = args.length < 1 ? new BoxBoxGym(envId) : new BoxBoxGym(envId, args[0])) {
 //        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("Pong-ram-v0")) {
 //        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("CartPole-v1")) {
 //        try (BoxBoxGym PROBLEM = new BoxBoxGym("LunarLanderContinuous-v2")) {
