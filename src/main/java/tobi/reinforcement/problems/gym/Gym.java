@@ -57,9 +57,10 @@ public abstract class Gym<O extends SpaceInstance, A extends SpaceInstance> impl
                 observation = reply.getObservation();
 
                 rewards += reward;
+                if (reply.isDone()) break;
 //                System.out.println("Reward: " + reward);
             }
-//        System.out.println("average reward: " + rewards / ITERATIONS / EPISODES);
+        System.out.println("average reward: " + rewards / ITERATIONS);
         }
         return rewards;
     }

@@ -25,7 +25,7 @@ class GymTest {
         final Network network = Network.parse(json);
         try (BoxDiscreteGym gym = new BoxDiscreteGym("CartPole-v1")) {
 //            for (int i = 0; i < 1000; i++)
-                gym.test(network, true, Integer.MAX_VALUE, 0);
+            gym.test(network, true, Integer.MAX_VALUE, 0);
         }
     }
 
@@ -60,6 +60,15 @@ class GymTest {
         try (BoxBoxGym gym = new BoxBoxGym("BipedalWalker-v2")) {
             gym.test(Network.parse(json), true, 0);
             gym.test(Network.parse(json2), true, 0);
+        }
+    }
+
+    @Test
+    public void BipedalHardcore() throws Exception {
+        final String json = " {\"outputs\":4,\"constValues\":{},\"neuronInputs\":{\"IN#10\":[],\"RELU#18316934\":[\"IN#15\"],\"IN#11\":[],\"IN#12\":[],\"OUT#0\":[\"MIN#1a1d7832\"],\"OUT#2\":[\"SIN#5c275b83\"],\"OUT#1\":[\"ABS#35d44cd3\"],\"ABS#35d44cd3\":[\"IN#a\"],\"OUT#3\":[\"IN#2\"],\"ADD#4306709f\":[\"IN#c\",\"IN#3\"],\"IN#a\":[],\"SUBTRACT#40e28324\":[\"IN#e\",\"ADD#4306709f\"],\"SIN#5c275b83\":[\"MULTIPLY#21a462ce\"],\"IN#d\":[],\"MAX#5c281ccb\":[\"ABS#35d44cd3\",\"IN#8\"],\"IN#e\":[],\"IN#b\":[],\"IN#c\":[],\"IN#13\":[],\"IN#14\":[],\"IN#15\":[],\"IN#f\":[],\"IN#16\":[],\"IN#17\":[],\"MULTIPLY#21a462ce\":[\"MAX#5c281ccb\",\"SUBTRACT#40e28324\"],\"IN#0\":[],\"IN#1\":[],\"IN#4\":[],\"IN#5\":[],\"IN#2\":[],\"IN#3\":[],\"IN#8\":[],\"IN#9\":[],\"IN#6\":[],\"MIN#1a1d7832\":[\"RELU#18316934\",\"ADD#4306709f\"],\"IN#7\":[]},\"varOutputs\":{\"IN#10\":[],\"RELU#18316934\":[],\"IN#11\":[],\"IN#12\":[],\"OUT#0\":[],\"OUT#2\":[\"IN#16\",\"IN#8\",\"IN#b\"],\"OUT#1\":[\"IN#4\",\"IN#12\",\"IN#5\",\"IN#1\",\"IN#8\"],\"ABS#35d44cd3\":[\"IN#14\",\"IN#16\",\"IN#1\"],\"OUT#3\":[\"IN#f\"],\"ADD#4306709f\":[],\"IN#a\":[],\"SUBTRACT#40e28324\":[\"IN#d\"],\"SIN#5c275b83\":[],\"IN#d\":[],\"MAX#5c281ccb\":[],\"IN#e\":[],\"IN#b\":[],\"IN#c\":[],\"IN#13\":[],\"IN#14\":[],\"IN#15\":[],\"IN#f\":[],\"IN#16\":[],\"IN#17\":[],\"MULTIPLY#21a462ce\":[\"IN#11\",\"IN#13\"],\"IN#0\":[],\"IN#1\":[],\"IN#4\":[],\"IN#5\":[],\"IN#2\":[],\"IN#3\":[],\"IN#8\":[],\"IN#9\":[],\"IN#6\":[],\"MIN#1a1d7832\":[\"IN#17\"],\"IN#7\":[]},\"inputs\":24}";
+        try (BoxBoxGym gym = new BoxBoxGym("BipedalWalkerHardcore-v3")) {
+            for (int i = 0; i < 1000; i++)
+                gym.test(Network.parse(json), true, 0);
         }
     }
 

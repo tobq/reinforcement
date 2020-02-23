@@ -20,8 +20,8 @@ public class Main {
 //    private static final Problem PROBLEM = new EqualsProblem(1);
     public static final double MUTATION_RATE = 0.1;
     public static final int GENERATION_SIZE = 1000;
-    //    public static final int GENERATION_SIZE = 10000;
-    private static final double PARENT_RATIO = 0.1;
+    //    public static final int GENERATION_SIZE = 1000;
+    private static final double PARENT_RATIO = 1;
     public static final int PARENT_COUNT = (int) Math.ceil(GENERATION_SIZE * PARENT_RATIO);
     public static final long MAX_GENERATION_COUNT = Long.MAX_VALUE;
     private static final boolean ASEXUAL_REPRODUCTION = false;
@@ -66,7 +66,7 @@ public class Main {
      */
     public static void main(String... args) throws InterruptedException, IOException, URISyntaxException, ExecutionException {
 //        final BoxDiscreteGym PROBLEM = new BoxDiscreteGym("MemorizeDigits-v0");
-        final String envId = "BipedalWalkerHardcore-v3";
+        final String envId = "BipedalWalker-v3";
         try (BoxBoxGym PROBLEM = args.length < 1 ? new BoxBoxGym(envId) : new BoxBoxGym(envId, args[0])) {
 //        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("Pong-ram-v0")) {
 //        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("CartPole-v1")) {
@@ -109,7 +109,7 @@ public class Main {
                     generation[i] = new Network(inputCount, outputCount);
                 }
 
-                ExecutorService exec = Executors.newCachedThreadPool();
+                ExecutorService exec = Executors.newFixedThreadPool(GENERATION_SIZE);
                 int seed = random.nextPositiveInt();
                 for (int g = 0; g < MAX_GENERATION_COUNT; g++) {
                     double[] fitnesses = new double[generation.length];
