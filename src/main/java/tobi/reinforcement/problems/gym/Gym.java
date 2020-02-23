@@ -60,7 +60,7 @@ public abstract class Gym<O extends SpaceInstance, A extends SpaceInstance> impl
                 if (reply.isDone()) break;
 //                System.out.println("Reward: " + reward);
             }
-        System.out.println("average reward: " + rewards / ITERATIONS);
+//        System.out.println("average reward: " + rewards / ITERATIONS);
         }
         return rewards;
     }
