@@ -21,7 +21,7 @@ public class Main {
     public static final double MUTATION_RATE = 0.1;
     public static final int GENERATION_SIZE = 10000;
     //    public static final int GENERATION_SIZE = 1000;
-    private static final double PARENT_RATIO = 0.3;
+    private static final double PARENT_RATIO = 0.1;
     public static final int PARENT_COUNT = (int) Math.ceil(GENERATION_SIZE * PARENT_RATIO);
     public static final long MAX_GENERATION_COUNT = Long.MAX_VALUE;
     private static final boolean ASEXUAL_REPRODUCTION = false;
