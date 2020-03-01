@@ -2,15 +2,16 @@ package tobi.reinforcement.network.neuron;
 
 import tobi.reinforcement.Utils;
 import tobi.reinforcement.network.Network;
+import tobi.reinforcement.network.Synapse;
 
 import static tobi.reinforcement.network.Network.NEURON_ID_PREFIX;
 
 abstract public class Neuron {
     final public double compute(Network network) {
-        final Neuron[] inputs = network.getInputs(this);
+        final Synapse[] inputs = network.getInputs(this);
         double[] inputValues = new double[inputs.length];
         for (int i = 0; i < inputs.length; i++) {
-            inputValues[i] = inputs[i].compute(network);
+            inputValues[i] = inputs[i].getNeuron().compute(network);
         }
         double value = doCompute(network, inputValues);
         network.updateVarOutputs(this, value);
@@ -39,7 +40,7 @@ abstract public class Neuron {
     }
 
     protected String getSerialParams(Network network) {
-        return Utils.join(network.getInputs(this), n -> n.serialise(network));
+        return Utils.join(network.getInputs(this), n -> n.getNeuron().serialise(network));
     }
 
     public String toString() {

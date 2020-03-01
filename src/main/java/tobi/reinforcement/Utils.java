@@ -129,7 +129,8 @@ public class Utils {
     }
 
     public static double randomValue() {
-        if (Math.random() < 0.5) {
+//        if (Utils.random.nextDouble() < 0.5) {
+        if (Utils.random.nextBoolean()) {
             return randomElement(-1, 0, 1);
         }
 
@@ -155,5 +156,9 @@ public class Utils {
 
     static public <T> String[] toString(Collection<T> objects, Function<T, String> mapper) {
         return objects.stream().map(mapper).toArray(String[]::new);
+    }
+
+    public static double mutateValue(double value) {
+        return value * random(0.5, 2) + random(-1D, 1D);
     }
 }

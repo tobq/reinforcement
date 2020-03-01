@@ -13,10 +13,14 @@ import org.jgrapht.ext.JGraphXAdapter;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.builder.GraphTypeBuilder;
 import tobi.reinforcement.network.Network;
+import tobi.reinforcement.network.Synapse;
 import tobi.reinforcement.network.neuron.Neuron;
 import tobi.reinforcement.problems.Approximate;
 
 import javax.swing.*;
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.DoubleUnaryOperator;
 
@@ -63,8 +67,8 @@ public class DebugUtils {
             graph.addVertex(neuron);
         }
         for (Neuron neuron : neurons) {
-            for (Neuron input : network.getInputs(neuron)) {
-                graph.addEdge(input, neuron);
+            for (Synapse input : network.getInputs(neuron)) {
+                graph.addEdge(input.getNeuron(), neuron);
             }
             for (Neuron output : network.getVarOutputs(neuron)) {
                 graph.addEdge(neuron, output);
@@ -90,5 +94,9 @@ public class DebugUtils {
         new mxCircleLayout(graphAdapter).execute(graphAdapter.getDefaultParent());
         frame.add(new mxGraphComponent(graphAdapter), 0);
         frame.validate();
+    }
+
+    public static String formatNeuronInputs(Map<Neuron, Synapse[]> neuronInputs) {
+        return Arrays.toString(Utils.toString(neuronInputs.entrySet(), entry -> entry.getKey() + " => " + Arrays.toString(entry.getValue())));
     }
 }

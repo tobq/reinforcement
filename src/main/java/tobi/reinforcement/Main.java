@@ -1,6 +1,7 @@
 package tobi.reinforcement;
 
 import tobi.reinforcement.network.Network;
+import tobi.reinforcement.problems.Approximate;
 import tobi.reinforcement.problems.gym.BoxBoxGym;
 import tobi.reinforcement.problems.gym.BoxDiscreteGym;
 import tobi.reinforcement.problems.gym.DiscreteBoxGym;
@@ -9,12 +10,13 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.DoubleUnaryOperator;
 
 public class Main {
     private static MyRandom random = new MyRandom();
     //    private static final DoubleUnaryOperator GOAL_FUNC = x -> x * x - 50;
 //    private static final Approximate PROBLEM = new Approximate(GOAL_FUNC);
-//    private static final Memorise PROBLEM = new Memorise(4);
+    //    private static final Memorise PROBLEM = new Memorise(4);
     //    private static final Problem PROBLEM = new SequenceProblem();
 //        private static final Problem PROBLEM = new Square();
 //    private static final Problem PROBLEM = new EqualsProblem(1);
@@ -22,6 +24,7 @@ public class Main {
     public static final int GENERATION_SIZE = 10000;
     //    public static final int GENERATION_SIZE = 1000;
     private static final double PARENT_RATIO = 0.1;
+//    private static final double PARENT_RATIO = 0.1;
     public static final int PARENT_COUNT = (int) Math.ceil(GENERATION_SIZE * PARENT_RATIO);
     public static final long MAX_GENERATION_COUNT = Long.MAX_VALUE;
     private static final boolean ASEXUAL_REPRODUCTION = false;
@@ -65,9 +68,9 @@ public class Main {
      * - implemented threading
      */
     public static void main(String... args) throws InterruptedException, IOException, URISyntaxException, ExecutionException {
-//        final BoxDiscreteGym PROBLEM = new BoxDiscreteGym("MemorizeDigits-v0");
         final String envId = "BipedalWalker-v3";
         try (BoxBoxGym PROBLEM = args.length < 1 ? new BoxBoxGym(envId) : new BoxBoxGym(envId, args[0])) {
+//        {
 //        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("Pong-ram-v0")) {
 //        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("CartPole-v1")) {
 //        try (BoxBoxGym PROBLEM = new BoxBoxGym("LunarLanderContinuous-v2")) {
@@ -118,7 +121,7 @@ public class Main {
                     for (Network network : generation) {
                         int finalSeed = seed;
                         tasks.add(() -> PROBLEM.test(network, false, /*1,*/ finalSeed));
-                        //                tasks.add(() -> PROBLEM.test(network));
+//                        tasks.add(() -> PROBLEM.test(network));
                     }
                     List<Future<Double>> invokeAll = exec.invokeAll(tasks);
                     for (int i = 0; i < invokeAll.size(); i++) {

@@ -1,5 +1,6 @@
 package tobi.reinforcement.network;
 
+import tobi.reinforcement.DebugUtils;
 import tobi.reinforcement.Utils;
 import tobi.reinforcement.network.neuron.*;
 import tobi.reinforcement.Main;
@@ -14,7 +15,7 @@ public class Network {
 
     private final Output[] outputs;
     // todo: MERGE VAR OUTPUTS + NEURON INPUTS INTO ONE OBJECT, AND USE A NEURONENTRY OBJECT FOR in/out
-    private final Map<Neuron, Neuron[]> neuronInputs;
+    private final Map<Neuron, Synapse[]> neuronInputs;
     private final Map<Neuron, Set<Variable>> varOutputs;
     private final Map<Variable, Double> varValues;
     private final Map<Constant, Double> constValues;
@@ -39,7 +40,7 @@ public class Network {
         for (int i = 0; i < inputSize; i++) {
             final Input input = new Input(i);
             inputs[i] = input;
-            neuronInputs.put(input, new Neuron[0]);
+            neuronInputs.put(input, new Synapse[0]);
             varOutputs.put(input, new HashSet<>());
             //            registerNeuron(input);
         }
@@ -47,8 +48,9 @@ public class Network {
         for (int i = 0; i < outputSize; i++) {
             final Output output = new Output(i);
             outputs[i] = output;
-            neuronInputs.put(output, new Neuron[]{inputs[0]});
+            neuronInputs.put(output, new Synapse[]{new Synapse(inputs[0])});
             varOutputs.put(output, new HashSet<>());
+            // This should never be checked for - thus not lead to any NPE's
         }
 
         reset();
@@ -61,7 +63,7 @@ public class Network {
     public Network(
             Input[] inputs,
             Output[] outputs,
-            Map<Neuron, Neuron[]> neuronInputs,
+            Map<Neuron, Synapse[]> neuronInputs,
             Map<Neuron, Set<Variable>> varOutputs,
             Map<Constant, Double> constValues
     ) {
@@ -92,7 +94,7 @@ public class Network {
         JSONObject constValuesOb = network.getJSONObject("constValues");
 
         Map<String, Neuron> mapping = new HashMap<>();
-        Map<Neuron, Neuron[]> neuronInputs = new HashMap<>();
+        Map<Neuron, Synapse[]> neuronInputs = new HashMap<>();
         Map<Neuron, Set<Variable>> varOutputs = new HashMap<>();
         for (String key : neuronInputsOb.keySet()) {
             int splitIndex = key.indexOf(NEURON_ID_PREFIX);
@@ -112,18 +114,21 @@ public class Network {
                     break;
             }
             mapping.put(key, newNeuron);
-            neuronInputs.put(newNeuron, new Neuron[newNeuron.getInputCount()]);
+            neuronInputs.put(newNeuron, new Synapse[newNeuron.getInputCount()]);
             varOutputs.put(newNeuron, new HashSet<>());
         }
 
         for (String key : neuronInputsOb.keySet()) {
             Neuron neuron = mapping.get(key);
-            Neuron[] inputsArray = neuronInputs.get(neuron);
+            Synapse[] inputsArray = neuronInputs.get(neuron);
             Set<Variable> outputsSet = varOutputs.get(neuron);
 
             JSONArray inArray = neuronInputsOb.getJSONArray(key);
             for (int i = 0; i < inArray.length(); i++) {
-                inputsArray[i] = mapping.get(inArray.getString(i));
+                final JSONObject synapseOb = inArray.getJSONObject(i);
+                final Neuron synapseNeuron = mapping.get(synapseOb.getString("neuron"));
+                final double synapseStrength = synapseOb.getDouble("strength");
+                inputsArray[i] = new Synapse(synapseNeuron, synapseStrength);
             }
 
             JSONArray outArray = varOutputOb.getJSONArray(key);
@@ -132,10 +137,10 @@ public class Network {
             }
         }
 
-        HashMap<Constant, Double> constValues = new HashMap<Constant, Double>();
+        HashMap<Constant, Double> constValues = new HashMap<>();
         for (String constKey : constValuesOb.keySet()) {
-            Neuron constant = mapping.get(constKey);
-            constValues.put((Constant) constant, constValuesOb.getDouble(constKey));
+            Constant constant = (Constant) mapping.get(constKey);
+            constValues.put(constant, constValuesOb.getDouble(constKey));
         }
 
         return new Network(
@@ -156,12 +161,13 @@ public class Network {
         }
     }
 
-    private Set<Neuron> getInputable(Neuron neuron, Map<Neuron, Neuron[]> neuronInputs) {
-        return complement(traverseOutputs3(neuron, neuronInputs), neuronInputs);
+    private Set<Neuron> getInputable(Neuron neuron, Map<Neuron, Synapse[]> neuronInputs) {
+        return complement(traverseOutputs(neuron, neuronInputs), neuronInputs);
     }
 
-    private Neuron randomInput(Neuron neuron, Map<Neuron, Neuron[]> neuronInputs) {
-        return Utils.randomElement(getInputable(neuron, neuronInputs));
+    private Synapse randomInput(Neuron neuron, Map<Neuron, Synapse[]> neuronInputs) {
+        final Neuron input = Utils.randomElement(getInputable(neuron, neuronInputs));
+        return new Synapse(input);
     }
 //    static private Neuron randomOutput(Neuron neuron) {
 //        return randomElement(getOutputable(neuron, neuronInputs));
@@ -171,7 +177,7 @@ public class Network {
 
 //    }
 
-    private Set<Neuron> complement(Set<Neuron> neurons, Map<Neuron, Neuron[]> neuronInputs) {
+    private Set<Neuron> complement(Set<Neuron> neurons, Map<Neuron, Synapse[]> neuronInputs) {
         final Set<Neuron> universe = getNeurons(neuronInputs, inputs, outputs);
         universe.removeAll(neurons);
         return universe;
@@ -181,27 +187,34 @@ public class Network {
 
 //    }
 
-    private Set<Neuron> traverseOutputs3(Neuron target, Map<Neuron, Neuron[]> neuronInputs) {
-        return traverseInputs(target, invertNeuronInputs(neuronInputs));
-    }
-
-    private Map<Neuron, Neuron[]> invertNeuronInputs(Map<Neuron, Neuron[]> neuronInputs) {
-        final HashMap<Neuron, Set<Neuron>> neuronOutputs = new HashMap<Neuron, Set<Neuron>>();
+    private Set<Neuron> traverseOutputs(Neuron target, Map<Neuron, Synapse[]> neuronInputs) {
+        final HashMap<Neuron, Set<Synapse>> neuronOutputs = new HashMap<>();
+        // TODO: GETNEUONS() NOT RETURNING RIGHT INPUTS (STATICALLY), NEEDING TO SEARCH INSTEAD
         Set<Neuron> neurons = neuronInputs.keySet();
+
         for (Neuron neuron : neurons) {
             neuronOutputs.put(neuron, new HashSet<>());
         }
 
         for (Neuron neuron : neurons)
-            for (Neuron input : neuronInputs.get(neuron)) {
-                neuronOutputs.get(input).add(neuron);
+            for (Synapse synapse : neuronInputs.get(neuron)) {
+                final Neuron input = synapse.getNeuron();
+                neuronOutputs.get(input).add(new Synapse(neuron, 0));
             }
 
-        Map<Neuron, Neuron[]> finalNeuronOutputs = new HashMap<>();
-        for (Map.Entry<Neuron, Set<Neuron>> entry : neuronOutputs.entrySet()) {
-            finalNeuronOutputs.put(entry.getKey(), entry.getValue().toArray(new Neuron[0]));
+        Map<Neuron, Synapse[]> invertedNeuronInputs = new HashMap<>();
+        for (Map.Entry<Neuron, Set<Synapse>> entry : neuronOutputs.entrySet()) {
+            invertedNeuronInputs.put(entry.getKey(), entry.getValue().toArray(new Synapse[0]));
         }
-        return finalNeuronOutputs;
+
+        try {
+            return traverseInputs(target, invertedNeuronInputs);
+        } catch (NullPointerException e) {
+            System.out.println("target = " + target);
+            System.out.println("DebugUtils.formatNeuronInputs(neuronInputs) = " + DebugUtils.formatNeuronInputs(neuronInputs));
+            System.out.println("DebugUtils.formatNeuronInputs(invertedNeuronInputs) = " + DebugUtils.formatNeuronInputs(invertedNeuronInputs));
+            throw e;
+        }
     }
 
 
@@ -210,7 +223,7 @@ public class Network {
      */
     private Set<Neuron> traverseOutputs2(Neuron target, HashMap<Neuron, Neuron[]> neuronInputs) {
         final Set<Neuron> deps = new HashSet<>();
-        Stack<Neuron> calls = new Stack<Neuron>();
+        Stack<Neuron> calls = new Stack<>();
         calls.add(target);
 
         while (!calls.isEmpty()) {
@@ -233,14 +246,14 @@ public class Network {
     /**
      * @deprecated
      */
-    private Set<Neuron> traverseOutputs(Neuron target, HashMap<Neuron, Neuron[]> neuronInputs) {
+    private Set<Neuron> traverseOutputs1(Neuron target, HashMap<Neuron, Neuron[]> neuronInputs) {
         final Set<Neuron> deps = new HashSet<>();
         deps.add(target);
 
         for (Map.Entry<Neuron, Neuron[]> entry : neuronInputs.entrySet()) {
             for (Neuron neuron : entry.getValue()) {
                 if (neuron == target) {
-                    deps.addAll(traverseOutputs(entry.getKey(), neuronInputs));
+                    deps.addAll(traverseOutputs1(entry.getKey(), neuronInputs));
                     break;
                 }
             }
@@ -298,7 +311,7 @@ public class Network {
         return result;
     }
 
-    public Neuron[] getInputs(Neuron neuron) {
+    public Synapse[] getInputs(Neuron neuron) {
         return neuronInputs.get(neuron);
     }
 
@@ -318,15 +331,15 @@ public class Network {
 
         // TODO: EXPERIMENT WITH ALLOWING VARIABLES TO VARIABLES LINKS
 
-        final HashMap<Constant, Double> constValues = new HashMap<Constant, Double>();
-        final HashMap<Neuron, Set<Variable>> varOutputs = new HashMap<Neuron, Set<Variable>>();
-        final HashMap<Neuron, Neuron[]> neuronInputs = new HashMap<Neuron, Neuron[]>();
+        final HashMap<Constant, Double> constValues = new HashMap<>();
+        final HashMap<Neuron, Set<Variable>> varOutputs = new HashMap<>();
+        final HashMap<Neuron, Synapse[]> neuronInputs = new HashMap<>();
 
         for (Constant constant : getConsts(this.neuronInputs, inputs, outputs)) {
             // Copy constants
             final double value = this.constValues.get(constant);
             if (Utils.shouldMutate(mutationRate)) {
-                constValues.put(constant, value * Utils.logRandom(0.5, 2) + Utils.random(-1D, 1D));
+                constValues.put(constant, Utils.mutateValue(value));
             } else {
                 constValues.put(constant, value);
             }
@@ -335,7 +348,7 @@ public class Network {
         final Set<Neuron> neurons = getNeurons(this.neuronInputs, inputs, outputs);
         for (Neuron neuron : neurons) {
             // copy links
-            Neuron[] inputs = getInputs(neuron);
+            Synapse[] inputs = getInputs(neuron);
             neuronInputs.put(neuron, inputs.clone());
 
             // copy variable outputs
@@ -358,7 +371,7 @@ public class Network {
         }
 
         for (Neuron neuron : neurons) {
-            final Neuron[] inputs = neuronInputs.get(neuron);
+            final Synapse[] inputs = neuronInputs.get(neuron);
 
             if (inputs.length != 0) {
                 //TODO: rework for multi-mutation
@@ -368,10 +381,10 @@ public class Network {
                     if (newNeuron instanceof Constant) constValues.put((Constant) newNeuron, Utils.randomValue());
 
                     final int randomIndex = Utils.random.nextInt(inputs.length);
-                    Neuron oldInput = inputs[randomIndex];
+                    Synapse oldInput = inputs[randomIndex];
 
                     final int newInputCount = newNeuron.getInputCount();
-                    final Neuron[] newNeuronsInputs = new Neuron[newInputCount];
+                    final Synapse[] newNeuronsInputs = new Synapse[newInputCount];
                     if (newInputCount != 0) {
                         final int newRandomIndex = Utils.random.nextInt(newInputCount);
                         newNeuronsInputs[newRandomIndex] = oldInput;
@@ -382,15 +395,25 @@ public class Network {
                             newNeuronsInputs[i] = randomInput(neuron, neuronInputs);
                     }
 
-                    inputs[randomIndex] = newNeuron;
+                    inputs[randomIndex] = new Synapse(newNeuron);
                     neuronInputs.put(newNeuron, newNeuronsInputs);
                     varOutputs.put(newNeuron, new HashSet<>());
                 }
                 if (Utils.shouldMutate(mutationRate)) {
                     // Set random input location to an existing node
                     final int randomIndex = Utils.random.nextInt(inputs.length);
-                    final Neuron newInput = randomInput(neuron, neuronInputs);
-                    inputs[randomIndex] = newInput;
+                    inputs[randomIndex] = randomInput(neuron, neuronInputs);
+                }
+            }
+        }
+
+        for (Map.Entry<Neuron, Synapse[]> entry : neuronInputs.entrySet()) {
+            final Synapse[] synapses = entry.getValue();
+            for (int i = 0; i < synapses.length; i++) {
+                if (Utils.shouldMutate(mutationRate)) {
+                    Synapse synapse = synapses[i];
+                    double newStrength = Utils.mutateValue(synapse.getStrength());
+                    synapses[i] = new Synapse(synapse.getNeuron(), newStrength);
                 }
             }
         }
@@ -409,23 +432,27 @@ public class Network {
         return neuronInputs.keySet();
     }
 
-    static public Set<Neuron> getNeurons(Map<Neuron, Neuron[]> neuronInputs, Input[] inputs, Output[] outputs) {
-        final Set<Neuron> neurons = new HashSet<>();
+    static public Set<Neuron> getNeurons(Map<Neuron, Synapse[]> neuronInputs, Input[] inputs, Output[] outputs) {
+        // TODO: GETNEUONS() NOT RETURNING RIGHT INPUTS (STATICALLY), NEEDING TO SEARCH INSTEAD
+        final Set<Neuron> foundNeurons = new HashSet<>();
 
         for (Output output : outputs) {
-            neurons.addAll(traverseInputs(output, neuronInputs));
+            foundNeurons.addAll(traverseInputs(output, neuronInputs, foundNeurons));
         }
-        neurons.addAll(Arrays.asList(inputs));
-        return neurons;
+
+        // Inputs may not be used (but should not be removed - due to being redundant)
+        foundNeurons.addAll(Arrays.asList(inputs));
+
+        return foundNeurons;
     }
 
-    static public Set<Variable> getVars(Map<Neuron, Neuron[]> neuronInputs, Input[] inputs, Output[] outputs) {
+    static public Set<Variable> getVars(Map<Neuron, Synapse[]> neuronInputs, Input[] inputs, Output[] outputs) {
         final Set<? extends Neuron> neurons = getNeurons(neuronInputs, inputs, outputs);
         neurons.removeIf(x -> !(x instanceof Variable));
         return (Set<Variable>) neurons;
     }
 
-    static public Set<Constant> getConsts(Map<Neuron, Neuron[]> neuronInputs, Input[] inputs, Output[] outputs) {
+    static public Set<Constant> getConsts(Map<Neuron, Synapse[]> neuronInputs, Input[] inputs, Output[] outputs) {
         final Set<? extends Neuron> neurons = getNeurons(neuronInputs, inputs, outputs);
         neurons.removeIf(x -> !(x instanceof Constant));
         return (Set<Constant>) neurons;
@@ -435,16 +462,22 @@ public class Network {
 //        return traverseInputs(neuron, neuronInputs);
 //    }
 
-    static public Set<Neuron> traverseInputs(Neuron target, Map<Neuron, Neuron[]> neuronInputs) {
-        final Set<Neuron> deps = new HashSet<>();
-        Stack<Neuron> calls = new Stack<Neuron>();
+    static public Set<Neuron> traverseInputs(Neuron target, Map<Neuron, Synapse[]> neuronInputs) {
+        return traverseInputs(target, neuronInputs, new HashSet<>());
+    }
+
+    static public Set<Neuron> traverseInputs(Neuron target, Map<Neuron, Synapse[]> neuronInputs, Set<Neuron> found) {
+        final Set<Neuron> deps = new HashSet<>(found);
+        Stack<Neuron> calls = new Stack<>();
         calls.add(target);
 
         while (!calls.isEmpty()) {
             final Neuron call = calls.pop();
             if (deps.contains(call)) continue;
             deps.add(call);
-            Collections.addAll(calls, neuronInputs.get(call));
+            for (Synapse synapse : neuronInputs.get(call)) {
+                calls.add(synapse.getNeuron());
+            }
         }
         return deps;
     }
@@ -480,8 +513,12 @@ public class Network {
         JSONObject neuronInputsJSON = new JSONObject();
         JSONObject varOutputsJSON = new JSONObject();
         JSONObject constValuesJSON = new JSONObject();
-        for (Map.Entry<Neuron, Neuron[]> entry : neuronInputs.entrySet()) {
-            neuronInputsJSON.put(entry.getKey().toString(), new JSONArray(Utils.toString(entry.getValue())));
+        for (Map.Entry<Neuron, Synapse[]> entry : neuronInputs.entrySet()) {
+            final JSONArray inputsArray = new JSONArray();
+            for (Synapse synapse : entry.getValue()) {
+                inputsArray.put(synapse.serialise());
+            }
+            neuronInputsJSON.put(entry.getKey().toString(), inputsArray);
         }
         for (Map.Entry<Neuron, Set<Variable>> entry : varOutputs.entrySet()) {
             varOutputsJSON.put(entry.getKey().toString(), new JSONArray(Utils.toString(entry.getValue())));
@@ -511,22 +548,22 @@ public class Network {
         double aWeight = aFitness / maxFitness;
         double bWeight = bFitness / maxFitness;
 
-        HashMap<Neuron, Neuron[]> newNeuronInputs = new HashMap<Neuron, Neuron[]>();
-        HashMap<Neuron, Set<Variable>> newVarOutputs = new HashMap<Neuron, Set<Variable>>();
-        HashMap<Constant, Double> newConstValues = new HashMap<Constant, Double>();
+        HashMap<Neuron, Synapse[]> newNeuronInputs = new HashMap<>();
+        HashMap<Neuron, Set<Variable>> newVarOutputs = new HashMap<>();
+        HashMap<Constant, Double> newConstValues = new HashMap<>();
 
         Output[] outputs = a.outputs;
         Input[] inputs = a.inputs;
 
         for (Output output : outputs) {
-            chooseLink(a, b, aWeight, bWeight, newNeuronInputs, newVarOutputs, output);
+            chooseLink(a, b, aWeight, bWeight, newNeuronInputs, output);
         }
 
         for (Constant constant : getConsts(newNeuronInputs, inputs, outputs)) {
             final double newConstValue;
             if (a.constValues.containsKey(constant)) {
                 if (b.constValues.containsKey(constant)) {
-                    newConstValue = aWeight/**AAA*/ > bWeight/**BBB*/ ? a.constValues.get(constant) : b.constValues.get(constant);
+                    newConstValue = aWeight > bWeight ? a.constValues.get(constant) : b.constValues.get(constant);
                 } else {
                     newConstValue = a.constValues.get(constant);
                 }
@@ -539,21 +576,23 @@ public class Network {
 
         Set<Neuron> neurons = getNeurons(newNeuronInputs, inputs, outputs);
         for (Neuron neuron : neurons) {
-            HashSet<Variable> varOutput = new HashSet<Variable>();
+            HashSet<Variable> varOutput = new HashSet<>();
+            // TODO: INVESTIGATE WHICH VAR OUTPUTS SHOULD BE SELECTED
+            //    CURRENTLY , SELECTED FROM ALL PARENTS (WHERE POSSIBLE)
             for (Network parent : parents) {
                 if (parent.varOutputs.containsKey(neuron)) {
                     for (Variable variable : parent.varOutputs.get(neuron)) {
                         if (neurons.contains(variable)) varOutput.add(variable);
                     }
-                    break;
                 }
             }
-
             newVarOutputs.put(neuron, varOutput);
+
+
         }
 
         for (Input input : inputs) {
-            newNeuronInputs.put(input, new Neuron[]{});
+            newNeuronInputs.put(input, new Synapse[]{});
         }
 
         return new Network(
@@ -570,14 +609,13 @@ public class Network {
             Network b,
             double aWeight,
             double bWeight,
-            HashMap<Neuron, Neuron[]> newNeuronInputs,
-            HashMap<Neuron, Set<Variable>> newVarOutputs,
+            HashMap<Neuron, Synapse[]> newNeuronInputs,
             Neuron subject
     ) {
-        Neuron[] aInputs = a.neuronInputs.get(subject);
-        Neuron[] bInputs = b.neuronInputs.get(subject);
+        Synapse[] aInputs = a.neuronInputs.get(subject);
+        Synapse[] bInputs = b.neuronInputs.get(subject);
         int inputCount = subject.getInputCount();
-        Neuron[] newInputs = new Neuron[inputCount];
+        Synapse[] newInputs = new Synapse[inputCount];
 
         // TODO: UNION VAR OUTPUTS AND CHECK ALLLLLL LDL DL SDL SLS DL
         // Variable outputs need to be decided on whether there's a variable output
@@ -586,17 +624,19 @@ public class Network {
             if (b.neuronInputs.containsKey(subject)) {
                 for (int i = 0; i < inputCount; i++) {
                     // TODO: >>>>>>>>>>>>>>>>>>>>>>>>>>>> CHECK WHETHER THIS CAN INTRODUCE CYCLES
-                    Neuron newInput = aWeight/**aLinkStrength*/ > bWeight/**bLinkStrength*/ ? aInputs[i] : bInputs[i];
-                    newInputs[i] = newInput;
-                    chooseLink(a, b, aWeight, bWeight, newNeuronInputs, newVarOutputs, newInput);
+                    final Synapse aSynapse = aInputs[i];
+                    final Synapse bSynapse = bInputs[i];
+                    Synapse newSynapse = aWeight * aSynapse.getStrength() > bWeight * bSynapse.getStrength() ? aSynapse : bSynapse;
+                    newInputs[i] = newSynapse;
+                    chooseLink(a, b, aWeight, bWeight, newNeuronInputs, newSynapse.getNeuron());
                 }
             } else {
 //            if (aWeight > bWeight) { // TODO: EXPERIMENT WITH CHOoSING RANDOM new random input (is this is excess of weakling)
                 for (int i = 0; i < inputCount; i++) {
                     // TODO: >>>>>>>>>>>>>>>>>>>>>>>>>>>> CHECK WHETHER THIS CAN INTRODUCE CYCLES
-                    Neuron newInput = aInputs[i];
-                    newInputs[i] = newInput;
-                    chooseLink(a, b, aWeight, bWeight, newNeuronInputs, newVarOutputs, newInput);
+                    final Synapse synapse = aInputs[i];
+                    newInputs[i] = synapse;
+                    chooseLink(a, b, aWeight, bWeight, newNeuronInputs, synapse.getNeuron());
 //                }
                 }
             }
@@ -604,9 +644,9 @@ public class Network {
 //            { // TODO: EXPERIMENT WITH CHOoSING RANDOM new random input (is this is excess of weakling)
             for (int i = 0; i < inputCount; i++) {
                 // TODO: >>>>>>>>>>>>>>>>>>>>>>>>>>>> CHECK WHETHER THIS CAN INTRODUCE CYCLES
-                Neuron newInput = bInputs[i];
-                newInputs[i] = newInput;
-                chooseLink(a, b, aWeight, bWeight, newNeuronInputs, newVarOutputs, newInput);
+                final Synapse synapse = bInputs[i];
+                newInputs[i] = synapse;
+                chooseLink(a, b, aWeight, bWeight, newNeuronInputs, synapse.getNeuron());
             }
 //            }
         }
