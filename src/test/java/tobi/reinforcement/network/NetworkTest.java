@@ -113,9 +113,9 @@ public class NetworkTest {
         assertNetworksEqual(generatedNetwork, Network.parse(generatedNetwork.serialise()));
     }
 
-    private void assertNetworksEqual(Network generatedNetwork, Network parse) {
+    private void assertNetworksEqual(Network a, Network b) {
         for (double[] input : RANDOM_INPUTS) {
-            Assertions.assertArrayEquals(generatedNetwork.compute(input), parse.compute(input));
+            Assertions.assertArrayEquals(a.compute(input), b.compute(input));
         }
     }
 }

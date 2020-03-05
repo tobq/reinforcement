@@ -21,10 +21,10 @@ public class Main {
 //        private static final Problem PROBLEM = new Square();
 //    private static final Problem PROBLEM = new EqualsProblem(1);
     public static final double MUTATION_RATE = 0.1;
-    public static final int GENERATION_SIZE = 10000;
+    public static final int GENERATION_SIZE = 1000;
     //    public static final int GENERATION_SIZE = 1000;
+//    private static final double PARENT_RATIO = 1;
     private static final double PARENT_RATIO = 0.1;
-//    private static final double PARENT_RATIO = 0.1;
     public static final int PARENT_COUNT = (int) Math.ceil(GENERATION_SIZE * PARENT_RATIO);
     public static final long MAX_GENERATION_COUNT = Long.MAX_VALUE;
     private static final boolean ASEXUAL_REPRODUCTION = false;
@@ -69,7 +69,7 @@ public class Main {
      */
     public static void main(String... args) throws InterruptedException, IOException, URISyntaxException, ExecutionException {
         final String envId = "BipedalWalker-v3";
-        try (BoxBoxGym PROBLEM = args.length < 1 ? new BoxBoxGym(envId) : new BoxBoxGym(envId, args[0])) {
+        try (BoxBoxGym PROBLEM = args.length == 0 ? new BoxBoxGym(envId) : new BoxBoxGym(envId, args[0])) {
 //        {
 //        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("Pong-ram-v0")) {
 //        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("CartPole-v1")) {
