@@ -355,13 +355,13 @@ public class Network {
             final HashSet<Variable> outputs = new HashSet<>(this.varOutputs.get(neuron));
 
             if (!(neuron instanceof Variable || neuron instanceof Constant)) {
-                if (Utils.shouldMutate(mutationRate)) {
+                while (Utils.shouldMutate(mutationRate)) {
                     // add existing var as output
                     final Set<Variable> vars = getVars(this.neuronInputs, this.inputs, this.outputs);
 //                    vars.remove(Arrays.asList(this.inputs));
                     outputs.add(Utils.randomElement(vars));
                 }
-                if (Utils.shouldMutate(mutationRate)) {
+                while (Utils.shouldMutate(mutationRate)) {
                     // remove a var output
                     if (outputs.size() != 0) outputs.remove(Utils.randomElement(outputs));
                 }
@@ -375,7 +375,7 @@ public class Network {
 
             if (inputs.length != 0) {
                 //TODO: rework for multi-mutation
-                if (Utils.shouldMutate(mutationRate)) {
+                while (Utils.shouldMutate(mutationRate)) {
                     // Set random input location to a newly created node
                     final Neuron newNeuron = Utils.generateRandomNeuron();
                     if (newNeuron instanceof Constant) constValues.put((Constant) newNeuron, Utils.randomValue());
@@ -399,7 +399,7 @@ public class Network {
                     neuronInputs.put(newNeuron, newNeuronsInputs);
                     varOutputs.put(newNeuron, new HashSet<>());
                 }
-                if (Utils.shouldMutate(mutationRate)) {
+                while (Utils.shouldMutate(mutationRate)) {
                     // Set random input location to an existing node
                     final int randomIndex = Utils.random.nextInt(inputs.length);
                     inputs[randomIndex] = randomInput(neuron, neuronInputs);
