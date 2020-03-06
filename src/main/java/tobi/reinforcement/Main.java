@@ -130,14 +130,15 @@ public class Main {
 
                 Network[] generation = new Network[GENERATION_SIZE];
 
-                if (cmd.hasOption('n')) for (int i = 0; i < generation.length; i++) {
-                    generation[i] = new Network(inputCount, outputCount);
-                }
-                else {
+                if (cmd.hasOption('n')) {
                     Network baseNetwork = Network.parse(cmd.getOptionValue('b'));
                     generation[0] = baseNetwork.clone();
                     for (int i = 1; i < generation.length; i++) {
                         generation[i] = baseNetwork.copy();
+                    }
+                } else {
+                    for (int i = 0; i < generation.length; i++) {
+                        generation[i] = new Network(inputCount, outputCount);
                     }
                 }
 
