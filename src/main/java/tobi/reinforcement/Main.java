@@ -90,7 +90,7 @@ public class Main {
 
         final String envId = "BipedalWalker-v3";
 
-        try (BoxBoxGym PROBLEM = cmd.hasOption('i') ? new BoxBoxGym(envId) : new BoxBoxGym(envId, cmd.getOptionValue('i'))) {
+        try (BoxBoxGym PROBLEM = cmd.hasOption('i') ? new BoxBoxGym(envId, cmd.getOptionValue('i')) : new BoxBoxGym(envId)) {
 //        {
 //        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("Pong-ram-v0")) {
 //        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("CartPole-v1")) {
@@ -130,7 +130,7 @@ public class Main {
 
                 Network[] generation = new Network[GENERATION_SIZE];
 
-                if (cmd.hasOption('n')) {
+                if (cmd.hasOption('b')) {
                     Network baseNetwork = Network.parse(cmd.getOptionValue('b'));
                     generation[0] = baseNetwork.clone();
                     for (int i = 1; i < generation.length; i++) {
