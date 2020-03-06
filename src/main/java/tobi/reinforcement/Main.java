@@ -87,6 +87,7 @@ public class Main {
             System.exit(1);
             return;
         }
+        System.out.println(Arrays.toString((args)));
 
         final String envId = "BipedalWalker-v3";
 
