@@ -1,5 +1,6 @@
 package tobi.reinforcement;
 
+import org.apache.commons.cli.*;
 import tobi.reinforcement.network.Network;
 import tobi.reinforcement.problems.Approximate;
 import tobi.reinforcement.problems.gym.BoxBoxGym;
@@ -68,8 +69,28 @@ public class Main {
      * - implemented threading
      */
     public static void main(String... args) throws InterruptedException, IOException, URISyntaxException, ExecutionException {
+
+        Options options = new Options();
+
+        options.addOption("i", "interpreter", true, "Python interpreter (executable) to be used.");
+
+        options.addOption("b", "base-network", true, "Based network used to generate initial population");
+
+        CommandLineParser parser = new DefaultParser();
+        HelpFormatter formatter = new HelpFormatter();
+        CommandLine cmd;
+        try {
+            cmd = parser.parse(options, args);
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            formatter.printHelp("utility-name", options);
+            System.exit(1);
+            return;
+        }
+
         final String envId = "BipedalWalker-v3";
-        try (BoxBoxGym PROBLEM = args.length == 0 ? new BoxBoxGym(envId) : new BoxBoxGym(envId, args[0])) {
+
+        try (BoxBoxGym PROBLEM = cmd.hasOption('i') ? new BoxBoxGym(envId) : new BoxBoxGym(envId, cmd.getOptionValue('i'))) {
 //        {
 //        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("Pong-ram-v0")) {
 //        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("CartPole-v1")) {
@@ -108,8 +129,16 @@ public class Main {
                 int outputCount = PROBLEM.getLabelLength();
 
                 Network[] generation = new Network[GENERATION_SIZE];
-                for (int i = 0; i < generation.length; i++) {
+
+                if (cmd.hasOption('n')) for (int i = 0; i < generation.length; i++) {
                     generation[i] = new Network(inputCount, outputCount);
+                }
+                else {
+                    Network baseNetwork = Network.parse(cmd.getOptionValue('b'));
+                    generation[0] = baseNetwork.clone();
+                    for (int i = 1; i < generation.length; i++) {
+                        generation[i] = baseNetwork.copy();
+                    }
                 }
 
                 ExecutorService exec = Executors.newFixedThreadPool(GENERATION_SIZE);
@@ -178,7 +207,13 @@ public class Main {
                             int randomIndexB = Utils.logRandom(generation);
                             Network a = generation[randomIndexA];
                             Network b = generation[randomIndexB];
-                            Network crossover = Network.crossover(a, b, fitnesses[randomIndexA], fitnesses[randomIndexB]);
+                            Network crossover;
+                            while (true) try {
+                                crossover = Network.crossover(a, b, fitnesses[randomIndexA], fitnesses[randomIndexB]);
+                                break;
+                            } catch (StackOverflowError e) {
+                                System.out.println("Caught stack overflow during crossover");
+                            }
                             if (COPY_CROSSOVERS) crossover = crossover.copy();
                             nextGen[i] = crossover;
                         }
