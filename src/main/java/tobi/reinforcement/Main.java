@@ -3,6 +3,7 @@ package tobi.reinforcement;
 import org.apache.commons.cli.*;
 import tobi.reinforcement.network.Network;
 import tobi.reinforcement.problems.Approximate;
+import tobi.reinforcement.problems.XORProblem;
 import tobi.reinforcement.problems.gym.BoxBoxGym;
 import tobi.reinforcement.problems.gym.BoxDiscreteGym;
 import tobi.reinforcement.problems.gym.DiscreteBoxGym;
@@ -22,7 +23,7 @@ public class Main {
 //        private static final Problem PROBLEM = new Square();
 //    private static final Problem PROBLEM = new EqualsProblem(1);
     public static final double MUTATION_RATE = 0.1;
-    public static final int GENERATION_SIZE = 1000;
+    public static final int GENERATION_SIZE = 150;
     //    public static final int GENERATION_SIZE = 10000;
 //    private static final double PARENT_RATIO = 1;
     private static final double PARENT_RATIO = 0.1;
@@ -92,6 +93,7 @@ public class Main {
         final String envId = "BipedalWalker-v3";
 
         try (BoxBoxGym PROBLEM = cmd.hasOption('i') ? new BoxBoxGym(envId, cmd.getOptionValue('i')) : new BoxBoxGym(envId)) {
+//        XORProblem PROBLEM = new XORProblem();
 //        {
 //        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("Pong-ram-v0")) {
 //        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("CartPole-v1")) {
@@ -209,13 +211,7 @@ public class Main {
                             int randomIndexB = Utils.logRandom(generation);
                             Network a = generation[randomIndexA];
                             Network b = generation[randomIndexB];
-                            Network crossover;
-                            while (true) try {
-                                crossover = Network.crossover(a, b, fitnesses[randomIndexA], fitnesses[randomIndexB]);
-                                break;
-                            } catch (StackOverflowError e) {
-                                System.out.println("Caught stack overflow during crossover");
-                            }
+                            Network crossover = Network.crossover(a, b, fitnesses[randomIndexA], fitnesses[randomIndexB]);
                             if (COPY_CROSSOVERS) crossover = crossover.copy();
                             nextGen[i] = crossover;
                         }

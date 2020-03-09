@@ -187,10 +187,10 @@ public class Network {
 
 //    }
 
-    private Set<Neuron> traverseOutputs(Neuron target, Map<Neuron, Synapse[]> neuronInputs) {
+    private static Set<Neuron> traverseOutputs(Neuron target, Map<Neuron, Synapse[]> neuronInputs) {
         final HashMap<Neuron, Set<Synapse>> neuronOutputs = new HashMap<>();
         // TODO: GETNEUONS() NOT RETURNING RIGHT INPUTS (STATICALLY), NEEDING TO SEARCH INSTEAD
-        Set<Neuron> neurons = neuronInputs.keySet();
+        Set<Neuron> neurons = getNeurons(neuronInputs);
 
         for (Neuron neuron : neurons) {
             neuronOutputs.put(neuron, new HashSet<>());
@@ -207,14 +207,19 @@ public class Network {
             invertedNeuronInputs.put(entry.getKey(), entry.getValue().toArray(new Synapse[0]));
         }
 
-        try {
-            return traverseInputs(target, invertedNeuronInputs);
-        } catch (NullPointerException e) {
-            System.out.println("target = " + target);
-            System.out.println("DebugUtils.formatNeuronInputs(neuronInputs) = " + DebugUtils.formatNeuronInputs(neuronInputs));
-            System.out.println("DebugUtils.formatNeuronInputs(invertedNeuronInputs) = " + DebugUtils.formatNeuronInputs(invertedNeuronInputs));
-            throw e;
-        }
+//        try {
+            if (invertedNeuronInputs.containsKey(target)) return traverseInputs(target, invertedNeuronInputs);
+            return new HashSet<>();
+//        } catch (NullPointerException e) {
+//            System.out.println("target = " + target);
+//            System.out.println("DebugUtils.formatNeuronInputs(neuronInputs) = " + DebugUtils.formatNeuronInputs(neuronInputs));
+//            System.out.println("DebugUtils.formatNeuronInputs(invertedNeuronInputs) = " + DebugUtils.formatNeuronInputs(invertedNeuronInputs));
+//            throw e;
+//        }
+    }
+
+    private static Set<Neuron> getNeurons(Map<Neuron, Synapse[]> neuronInputs) {
+        return neuronInputs.keySet();
     }
 
 
@@ -429,7 +434,7 @@ public class Network {
 
 
     public Set<Neuron> getNeurons() {
-        return neuronInputs.keySet();
+        return getNeurons(neuronInputs);
     }
 
     static public Set<Neuron> getNeurons(Map<Neuron, Synapse[]> neuronInputs, Input[] inputs, Output[] outputs) {
@@ -556,7 +561,7 @@ public class Network {
         Input[] inputs = a.inputs;
 
         for (Output output : outputs) {
-            chooseLink(a, b, aWeight, bWeight, newNeuronInputs, output);
+            selectInputs(output, a, b, aWeight, bWeight, newNeuronInputs);
         }
 
         for (Constant constant : getConsts(newNeuronInputs, inputs, outputs)) {
@@ -604,13 +609,13 @@ public class Network {
         );
     }
 
-    private static void chooseLink(
+    private static void selectInputs(
+            Neuron subject,
             Network a,
             Network b,
             double aWeight,
             double bWeight,
-            HashMap<Neuron, Synapse[]> newNeuronInputs,
-            Neuron subject
+            HashMap<Neuron, Synapse[]> newNeuronInputs
     ) {
         Synapse[] aInputs = a.neuronInputs.get(subject);
         Synapse[] bInputs = b.neuronInputs.get(subject);
@@ -624,11 +629,20 @@ public class Network {
             if (b.neuronInputs.containsKey(subject)) {
                 for (int i = 0; i < inputCount; i++) {
                     // TODO: >>>>>>>>>>>>>>>>>>>>>>>>>>>> CHECK WHETHER THIS CAN INTRODUCE CYCLES
+
+                    Set<Neuron> traversedOutputs = traverseOutputs(subject, newNeuronInputs);
                     final Synapse aSynapse = aInputs[i];
                     final Synapse bSynapse = bInputs[i];
-                    Synapse newSynapse = aWeight * aSynapse.getStrength() > bWeight * bSynapse.getStrength() ? aSynapse : bSynapse;
+                    Synapse newSynapse;
+                    if (traversedOutputs.contains(aSynapse.getNeuron()))
+                        newSynapse = bSynapse;
+                    else if (traversedOutputs.contains(bSynapse.getNeuron()))
+                        newSynapse = aSynapse;
+                    else
+                        newSynapse = aWeight * aSynapse.getStrength() > bWeight * bSynapse.getStrength() ? aSynapse : bSynapse;
+
                     newInputs[i] = newSynapse;
-                    chooseLink(a, b, aWeight, bWeight, newNeuronInputs, newSynapse.getNeuron());
+                    selectInputs(newSynapse.getNeuron(), a, b, aWeight, bWeight, newNeuronInputs);
                 }
             } else {
 //            if (aWeight > bWeight) { // TODO: EXPERIMENT WITH CHOoSING RANDOM new random input (is this is excess of weakling)
@@ -636,17 +650,17 @@ public class Network {
                     // TODO: >>>>>>>>>>>>>>>>>>>>>>>>>>>> CHECK WHETHER THIS CAN INTRODUCE CYCLES
                     final Synapse synapse = aInputs[i];
                     newInputs[i] = synapse;
-                    chooseLink(a, b, aWeight, bWeight, newNeuronInputs, synapse.getNeuron());
+                    selectInputs(synapse.getNeuron(), a, b, aWeight, bWeight, newNeuronInputs);
 //                }
                 }
             }
         } else {
-//            { // TODO: EXPERIMENT WITH CHOoSING RANDOM new random input (is this is excess of weakling)
+//            { // TODO: EXPERIMENT WITH CHOoSING RANDOM new random input (is  this is excess of weakling)
             for (int i = 0; i < inputCount; i++) {
                 // TODO: >>>>>>>>>>>>>>>>>>>>>>>>>>>> CHECK WHETHER THIS CAN INTRODUCE CYCLES
                 final Synapse synapse = bInputs[i];
                 newInputs[i] = synapse;
-                chooseLink(a, b, aWeight, bWeight, newNeuronInputs, synapse.getNeuron());
+                selectInputs(synapse.getNeuron(), a, b, aWeight, bWeight, newNeuronInputs);
             }
 //            }
         }
