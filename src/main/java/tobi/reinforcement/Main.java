@@ -19,7 +19,7 @@ public class Main {
 //        private static final Problem PROBLEM = new Square();
 //    private static final Problem PROBLEM = new EqualsProblem(1);
     public static final double MUTATION_RATE = 0.1;
-    public static final int GENERATION_SIZE = 150;
+    public static final int GENERATION_SIZE = 10000;
     //    public static final int GENERATION_SIZE = 10000;
 //    private static final double PARENT_RATIO = 1;
     private static final double PARENT_RATIO = 0.1;
