@@ -152,6 +152,38 @@ public class Network {
         );
     }
 
+    public static boolean isReachable(Neuron start, Neuron end, Map<Neuron, Synapse[]> neuronInputs) {
+        if (start == end) return true;
+        for (Synapse synapse : neuronInputs.get(end)) {
+            if (isReachable(start, synapse.getNeuron(), neuronInputs)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param start
+     * @param end
+     * @param neuronInputs
+     * @return
+     * @deprecated slower than {@link #isReachable(Neuron, Neuron, Map)}
+     */
+    public static boolean isReachable2(Neuron start, Neuron end, Map<Neuron, Synapse[]> neuronInputs) {
+        final Set<Neuron> reachable = new HashSet<>();
+        Stack<Neuron> calls = new Stack<>();
+        calls.add(end);
+
+        while (!calls.isEmpty()) {
+            final Neuron call = calls.pop();
+            if (reachable.contains(call)) continue;
+            if (call == start) return true;
+            reachable.add(call);
+            for (Synapse synapse : neuronInputs.get(call)) {
+                calls.add(synapse.getNeuron());
+            }
+        }
+        return false;
+    }
+
     /**
      * Resets vars
      */
