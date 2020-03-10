@@ -86,7 +86,9 @@ class GymTest {
 //    @Test
     public static void main(String[] args){
 //    public void XOR(){
-        Network network = Network.parse("{\"outputs\":1,\"constValues\":{},\"neuronInputs\":{\"IN#0\":[],\"IN#1\":[],\"ABS#542aa32a\":[{\"strength\":0.6093020621799065,\"neuron\":\"SUBTRACT#5dcaa37a\"}],\"SUBTRACT#5dcaa37a\":[{\"strength\":1.0522973863247547,\"neuron\":\"IN#0\"},{\"strength\":0.29214384813516614,\"neuron\":\"IN#1\"}],\"OUT#0\":[{\"strength\":0.7048253621922413,\"neuron\":\"ABS#542aa32a\"}]},\"varOutputs\":{\"IN#0\":[],\"IN#1\":[],\"ABS#542aa32a\":[],\"SUBTRACT#5dcaa37a\":[],\"OUT#0\":[\"IN#1\"]},\"inputs\":2}");
+//        String json = "{\"outputs\":1,\"constValues\":{},\"neuronInputs\":{\"IN#0\":[],\"IN#1\":[],\"ABS#542aa32a\":[{\"strength\":0.6093020621799065,\"neuron\":\"SUBTRACT#5dcaa37a\"}],\"SUBTRACT#5dcaa37a\":[{\"strength\":1.0522973863247547,\"neuron\":\"IN#0\"},{\"strength\":0.29214384813516614,\"neuron\":\"IN#1\"}],\"OUT#0\":[{\"strength\":0.7048253621922413,\"neuron\":\"ABS#542aa32a\"}]},\"varOutputs\":{\"IN#0\":[],\"IN#1\":[],\"ABS#542aa32a\":[],\"SUBTRACT#5dcaa37a\":[],\"OUT#0\":[\"IN#1\"]},\"inputs\":2}";
+        String json = "{\"outputs\":1,\"constValues\":{\"CONST#4c67cd9b\":-1},\"neuronInputs\":{\"IN#0\":[],\"IN#1\":[],\"ADD#7a05671c\":[{\"strength\":1.3573650209440797,\"neuron\":\"MULTIPLY#7ef79209\"},{\"strength\":0.42643050418755957,\"neuron\":\"IN#1\"}],\"MULTIPLY#7e9c257f\":[{\"strength\":0.9781877305214235,\"neuron\":\"ADD#7a05671c\"},{\"strength\":0.5013741592939107,\"neuron\":\"ADD#7a05671c\"}],\"OUT#0\":[{\"strength\":0.7245815991298363,\"neuron\":\"MULTIPLY#7e9c257f\"}],\"CONST#4c67cd9b\":[],\"MULTIPLY#7ef79209\":[{\"strength\":0.45763520377401967,\"neuron\":\"IN#0\"},{\"strength\":0.8049105040477885,\"neuron\":\"CONST#4c67cd9b\"}]},\"varOutputs\":{\"IN#0\":[],\"IN#1\":[],\"ADD#7a05671c\":[],\"MULTIPLY#7e9c257f\":[],\"OUT#0\":[],\"CONST#4c67cd9b\":[],\"MULTIPLY#7ef79209\":[]},\"inputs\":2}";
+        Network network = Network.parse(json);
         double[] result = network.compute(0,0);
         System.out.println("result = " + Arrays.toString(result));
         DebugUtils.showGraph(network);

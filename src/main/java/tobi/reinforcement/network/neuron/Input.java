@@ -2,14 +2,13 @@ package tobi.reinforcement.network.neuron;
 
 import tobi.reinforcement.network.Network;
 
-public class Input extends Variable {
+public class Input extends InputlessNeuron {
     public static final String SYMBOL = "IN";
     private final String ID;
 
     @Override
     double doGet(Network network) {
-        //        if (value == -1) new RuntimeException().printStackTrace();
-        return super.doGet(network);
+        return network.getInput(this);
     }
 
     public Input(int index) {

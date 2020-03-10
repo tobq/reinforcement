@@ -1,5 +1,6 @@
 package tobi.reinforcement.network;
 
+import tobi.gym.Box;
 import tobi.reinforcement.Utils;
 import tobi.reinforcement.network.neuron.*;
 import tobi.reinforcement.Main;
@@ -16,8 +17,9 @@ public class Network {
     // todo: MERGE VAR OUTPUTS + NEURON INPUTS INTO ONE OBJECT, AND USE A NEURONENTRY OBJECT FOR in/out
     public final Map<Neuron, Synapse[]> neuronInputs;
     private final Map<Neuron, Set<Variable>> varOutputs;
-    private final Map<Variable, Double> varValues;
     private final Map<Constant, Double> constValues;
+    private final Map<Variable, Double> varValues;
+    private HashMap<Input, Double> inputValues;
 
 //    private Neuron[] getNeurons() {
 //        return Neuron.getNeurons(this);
@@ -27,6 +29,7 @@ public class Network {
         neuronInputs = new HashMap<>();
         varOutputs = new HashMap<>();
         varValues = new HashMap<>();
+        inputValues = new HashMap<>();
         constValues = new HashMap<>();
 
 //        this.inputSize = inputSize;
@@ -73,6 +76,7 @@ public class Network {
         this.constValues = constValues;
 
         varValues = new HashMap<>();
+        inputValues = new HashMap<>();
 
         reset();
         neuronInputs.keySet().retainAll(getNeurons(neuronInputs, inputs, outputs));
@@ -153,6 +157,7 @@ public class Network {
 
     /**
      * Both start and end should be in network, or a NPE will occur
+     *
      * @param start
      * @param end
      * @param neuronInputs network
@@ -162,6 +167,7 @@ public class Network {
         if (start == end) return true;
 //        if (!neuronInputs.containsKey(end)) return false;
         for (Synapse synapse : neuronInputs.get(end)) {
+            if (synapse==null) continue;
             if (isReachable(start, synapse.getNeuron(), neuronInputs)) return true;
         }
         return false;
@@ -198,6 +204,11 @@ public class Network {
         for (Variable var : getVars(this.neuronInputs, inputs, outputs)) {
             setVar(var, 0);
         }
+
+//        // TODO: INVESTIGATE IF NECESSARY TO RESET INPUTS
+//        for (Input input : inputs) {
+//            inputValues.put(input, 0D);
+//        }
     }
 
     private Set<Neuron> getInputable(Neuron neuron, Map<Neuron, Synapse[]> neuronInputs) {
@@ -350,7 +361,7 @@ public class Network {
             throw new IllegalArgumentException("Invalid input size: " + inputs.length + ". Expected: " + this.inputs.length);
 
         for (int i = 0; i < inputs.length; i++)
-            setVar(this.inputs[i], inputs[i]);
+            inputValues.put(this.inputs[i], inputs[i]);
 
         double[] result = new double[outputs.length];
         for (int i = 0; i < outputs.length; i++) {
@@ -407,11 +418,11 @@ public class Network {
                     // add existing var as output
                     final Set<Variable> vars = getVars(this.neuronInputs, this.inputs, this.outputs);
 //                    vars.remove(Arrays.asList(this.inputs));
-                    outputs.add(Utils.randomElement(vars));
+                    if (!vars.isEmpty()) outputs.add(Utils.randomElement(vars));
                 }
                 while (Utils.shouldMutate(mutationRate)) {
                     // remove a var output
-                    if (outputs.size() != 0) outputs.remove(Utils.randomElement(outputs));
+                    if (!outputs.isEmpty()) outputs.remove(Utils.randomElement(outputs));
                 }
             }
 
@@ -664,12 +675,17 @@ public class Network {
         Synapse[] bInputs = b.neuronInputs.get(subject);
         int inputCount = subject.getInputCount();
         Synapse[] newInputs = new Synapse[inputCount];
+        newNeuronInputs.put(subject, newInputs);
 
         // TODO: UNION VAR OUTPUTS AND CHECK ALLLLLL LDL DL SDL SLS DL
         // Variable outputs need to be decided on whether there's a variable output
 
         if (a.neuronInputs.containsKey(subject)) {
             if (b.neuronInputs.containsKey(subject)) {
+//                TODO: MAKE CHECK FOR whether current subject is in both networks INSTANCE-TOLERANT
+//                    i.e. a copy multiply in both networks still gets recognised as shared between both networks
+//                      as opposed to requiring a direct clone between both networks
+
                 for (int i = 0; i < inputCount; i++) {
                     // TODO: >>>>>>>>>>>>>>>>>>>>>>>>>>>> CHECK WHETHER THIS CAN INTRODUCE CYCLES
                     final Synapse aSynapse = aInputs[i];
@@ -705,6 +721,9 @@ public class Network {
             }
 //            }
         }
-        newNeuronInputs.put(subject, newInputs);
+    }
+
+    public double getInput(Input input) {
+        return inputValues.get(input);
     }
 }

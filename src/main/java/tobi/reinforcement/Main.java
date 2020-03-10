@@ -2,6 +2,7 @@ package tobi.reinforcement;
 
 import org.apache.commons.cli.*;
 import tobi.reinforcement.network.Network;
+import tobi.reinforcement.problems.XORProblem;
 import tobi.reinforcement.problems.gym.BoxBoxGym;
 
 import java.io.*;
@@ -18,7 +19,7 @@ public class Main {
 //        private static final Problem PROBLEM = new Square();
 //    private static final Problem PROBLEM = new EqualsProblem(1);
     public static final double MUTATION_RATE = 0.1;
-    public static final int GENERATION_SIZE = 1000;
+    public static final int GENERATION_SIZE = 150;
     //    public static final int GENERATION_SIZE = 10000;
 //    private static final double PARENT_RATIO = 1;
     private static final double PARENT_RATIO = 0.1;
@@ -206,7 +207,14 @@ public class Main {
                             int randomIndexB = Utils.logRandom(generation);
                             Network a = generation[randomIndexA];
                             Network b = generation[randomIndexB];
-                            Network crossover = Network.crossover(a, b, fitnesses[randomIndexA], fitnesses[randomIndexB]);
+                            Network crossover;
+//                            try {
+                                crossover = Network.crossover(a, b, fitnesses[randomIndexA], fitnesses[randomIndexB]);
+//                            } catch (StackOverflowError e) {
+//                                DebugUtils.showGraph(a);
+//                                DebugUtils.showGraph(b);
+//                                throw e;
+//                            }
                             if (COPY_CROSSOVERS) crossover = crossover.copy();
                             nextGen[i] = crossover;
                         }
