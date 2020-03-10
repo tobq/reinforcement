@@ -2,3 +2,4 @@ build/
 .gradle/
 .idea/
 15*.csv
+nohup.out
