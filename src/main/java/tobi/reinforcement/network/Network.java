@@ -153,6 +153,7 @@ public class Network {
 
     public static boolean isReachable(Neuron start, Neuron end, Map<Neuron, Synapse[]> neuronInputs) {
         if (start == end) return true;
+        if (!neuronInputs.containsKey(end)) return false;
         for (Synapse synapse : neuronInputs.get(end)) {
             if (isReachable(start, synapse.getNeuron(), neuronInputs)) return true;
         }
