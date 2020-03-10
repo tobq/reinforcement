@@ -151,9 +151,16 @@ public class Network {
         );
     }
 
+    /**
+     * Both start and end should be in network, or a NPE will occur
+     * @param start
+     * @param end
+     * @param neuronInputs network
+     * @return
+     */
     public static boolean isReachable(Neuron start, Neuron end, Map<Neuron, Synapse[]> neuronInputs) {
         if (start == end) return true;
-        if (!neuronInputs.containsKey(end)) return false;
+//        if (!neuronInputs.containsKey(end)) return false;
         for (Synapse synapse : neuronInputs.get(end)) {
             if (isReachable(start, synapse.getNeuron(), neuronInputs)) return true;
         }
@@ -668,9 +675,9 @@ public class Network {
                     final Synapse aSynapse = aInputs[i];
                     final Synapse bSynapse = bInputs[i];
                     Synapse newSynapse;
-                    if (isReachable(subject, aSynapse.getNeuron(), newNeuronInputs))
+                    if (newNeuronInputs.containsKey(aSynapse.getNeuron()) && isReachable(subject, aSynapse.getNeuron(), newNeuronInputs))
                         newSynapse = bSynapse;
-                    else if (isReachable(subject, bSynapse.getNeuron(), newNeuronInputs))
+                    else if (newNeuronInputs.containsKey(bSynapse.getNeuron()) && isReachable(subject, bSynapse.getNeuron(), newNeuronInputs))
                         newSynapse = aSynapse;
                     else
                         newSynapse = aWeight * aSynapse.getStrength() > bWeight * bSynapse.getStrength() ? aSynapse : bSynapse;
