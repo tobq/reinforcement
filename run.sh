@@ -1,4 +1,3 @@
-pkill cota4 && \
 git pull && \
 gradle distTar && \
 rm ~/reinforcement-1.0-SNAPSHOT* -r && \
