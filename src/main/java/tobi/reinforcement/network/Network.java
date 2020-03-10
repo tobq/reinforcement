@@ -1,6 +1,5 @@
 package tobi.reinforcement.network;
 
-import tobi.reinforcement.DebugUtils;
 import tobi.reinforcement.Utils;
 import tobi.reinforcement.network.neuron.*;
 import tobi.reinforcement.Main;
@@ -15,7 +14,7 @@ public class Network {
 
     private final Output[] outputs;
     // todo: MERGE VAR OUTPUTS + NEURON INPUTS INTO ONE OBJECT, AND USE A NEURONENTRY OBJECT FOR in/out
-    private final Map<Neuron, Synapse[]> neuronInputs;
+    public final Map<Neuron, Synapse[]> neuronInputs;
     private final Map<Neuron, Set<Variable>> varOutputs;
     private final Map<Variable, Double> varValues;
     private final Map<Constant, Double> constValues;
@@ -194,7 +193,7 @@ public class Network {
     }
 
     private Set<Neuron> getInputable(Neuron neuron, Map<Neuron, Synapse[]> neuronInputs) {
-        return complement(traverseOutputs(neuron, neuronInputs), neuronInputs);
+        return complement(getReachable(neuron, neuronInputs), neuronInputs);
     }
 
     private Synapse randomInput(Neuron neuron, Map<Neuron, Synapse[]> neuronInputs) {
@@ -219,7 +218,11 @@ public class Network {
 
 //    }
 
-    private static Set<Neuron> traverseOutputs(Neuron target, Map<Neuron, Synapse[]> neuronInputs) {
+    public Set<Neuron> getReachable(Neuron target) {
+        return getReachable(target, neuronInputs);
+    }
+
+    public static Set<Neuron> getReachable(Neuron target, Map<Neuron, Synapse[]> neuronInputs) {
         final HashMap<Neuron, Set<Synapse>> neuronOutputs = new HashMap<>();
         // TODO: GETNEUONS() NOT RETURNING RIGHT INPUTS (STATICALLY), NEEDING TO SEARCH INSTEAD
         Set<Neuron> neurons = getNeurons(neuronInputs);
@@ -240,8 +243,8 @@ public class Network {
         }
 
 //        try {
-            if (invertedNeuronInputs.containsKey(target)) return traverseInputs(target, invertedNeuronInputs);
-            return new HashSet<>();
+        if (invertedNeuronInputs.containsKey(target)) return traverseInputs(target, invertedNeuronInputs);
+        return new HashSet<>();
 //        } catch (NullPointerException e) {
 //            System.out.println("target = " + target);
 //            System.out.println("DebugUtils.formatNeuronInputs(neuronInputs) = " + DebugUtils.formatNeuronInputs(neuronInputs));
@@ -661,14 +664,12 @@ public class Network {
             if (b.neuronInputs.containsKey(subject)) {
                 for (int i = 0; i < inputCount; i++) {
                     // TODO: >>>>>>>>>>>>>>>>>>>>>>>>>>>> CHECK WHETHER THIS CAN INTRODUCE CYCLES
-
-                    Set<Neuron> traversedOutputs = traverseOutputs(subject, newNeuronInputs);
                     final Synapse aSynapse = aInputs[i];
                     final Synapse bSynapse = bInputs[i];
                     Synapse newSynapse;
-                    if (traversedOutputs.contains(aSynapse.getNeuron()))
+                    if (isReachable(subject, aSynapse.getNeuron(), newNeuronInputs))
                         newSynapse = bSynapse;
-                    else if (traversedOutputs.contains(bSynapse.getNeuron()))
+                    else if (isReachable(subject, bSynapse.getNeuron(), newNeuronInputs))
                         newSynapse = aSynapse;
                     else
                         newSynapse = aWeight * aSynapse.getStrength() > bWeight * bSynapse.getStrength() ? aSynapse : bSynapse;
