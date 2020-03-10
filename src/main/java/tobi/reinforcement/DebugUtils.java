@@ -10,7 +10,6 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jgrapht.Graph;
 import org.jgrapht.ext.JGraphXAdapter;
-import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.builder.GraphTypeBuilder;
 import tobi.reinforcement.network.Network;
@@ -19,7 +18,6 @@ import tobi.reinforcement.network.neuron.Neuron;
 import tobi.reinforcement.problems.Approximate;
 
 import javax.swing.*;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;

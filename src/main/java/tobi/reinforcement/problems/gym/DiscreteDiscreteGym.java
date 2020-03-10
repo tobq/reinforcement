@@ -1,7 +1,6 @@
 package tobi.reinforcement.problems.gym;
 
 import tobi.gym.*;
-import tobi.gym.Discrete;
 import tobi.gym.util.DiscreteDiscreteEnvironment;
 
 import java.io.IOException;

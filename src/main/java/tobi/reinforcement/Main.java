@@ -2,17 +2,12 @@ package tobi.reinforcement;
 
 import org.apache.commons.cli.*;
 import tobi.reinforcement.network.Network;
-import tobi.reinforcement.problems.Approximate;
-import tobi.reinforcement.problems.XORProblem;
 import tobi.reinforcement.problems.gym.BoxBoxGym;
-import tobi.reinforcement.problems.gym.BoxDiscreteGym;
-import tobi.reinforcement.problems.gym.DiscreteBoxGym;
 
 import java.io.*;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.function.DoubleUnaryOperator;
 
 public class Main {
     private static MyRandom random = new MyRandom();
