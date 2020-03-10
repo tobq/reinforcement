@@ -10,7 +10,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jgrapht.Graph;
 import org.jgrapht.ext.JGraphXAdapter;
-import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.builder.GraphTypeBuilder;
 import tobi.reinforcement.network.Network;
 import tobi.reinforcement.network.Synapse;
@@ -18,7 +18,6 @@ import tobi.reinforcement.network.neuron.Neuron;
 import tobi.reinforcement.problems.Approximate;
 
 import javax.swing.*;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
@@ -54,21 +53,23 @@ public class DebugUtils {
         chartPanel.setChart(chart);
     }
 
-    private static Graph<Neuron, DefaultEdge> buildGraph(Network network) {
-        Graph<Neuron, DefaultEdge> graph = GraphTypeBuilder
-                .<Neuron, DefaultEdge>directed()
+    public static Graph<Neuron, DefaultWeightedEdge> buildGraph(Network network) {
+        Graph<Neuron, DefaultWeightedEdge> graph = GraphTypeBuilder
+                .<Neuron, DefaultWeightedEdge>directed()
                 .allowingMultipleEdges(true)
                 .allowingSelfLoops(false)
-                .weighted(false)
-                .edgeClass(DefaultEdge.class)
+                .weighted(true)
+                .edgeClass(DefaultWeightedEdge.class)
                 .buildGraph();
+
         Set<Neuron> neurons = network.getNeurons();
         for (Neuron neuron : neurons) {
             graph.addVertex(neuron);
         }
         for (Neuron neuron : neurons) {
             for (Synapse input : network.getInputs(neuron)) {
-                graph.addEdge(input.getNeuron(), neuron);
+                DefaultWeightedEdge edge = graph.addEdge(input.getNeuron(), neuron);
+                graph.setEdgeWeight(edge, input.getStrength());
             }
             for (Neuron output : network.getVarOutputs(neuron)) {
                 graph.addEdge(neuron, output);
@@ -81,7 +82,7 @@ public class DebugUtils {
         showGraph(buildGraph(network));
     }
 
-    private static void showGraph(Graph<Neuron, DefaultEdge> graph) {
+    private static void showGraph(Graph<Neuron, DefaultWeightedEdge> graph) {
         final JFrame frame = new JFrame("Neural Network Topology");
         // configure window
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -90,7 +91,7 @@ public class DebugUtils {
         frame.setVisible(true);
         frame.validate();
 
-        JGraphXAdapter<Neuron, DefaultEdge> graphAdapter = new JGraphXAdapter<>(graph);
+        JGraphXAdapter<Neuron, DefaultWeightedEdge> graphAdapter = new JGraphXAdapter<>(graph);
         new mxCircleLayout(graphAdapter).execute(graphAdapter.getDefaultParent());
         frame.add(new mxGraphComponent(graphAdapter), 0);
         frame.validate();

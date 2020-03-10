@@ -1,6 +1,5 @@
 package tobi.reinforcement;
 
-import tobi.reinforcement.network.neuron.Sin;
 import tobi.reinforcement.network.neuron.*;
 
 import java.util.*;

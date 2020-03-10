@@ -2,17 +2,12 @@ package tobi.reinforcement;
 
 import org.apache.commons.cli.*;
 import tobi.reinforcement.network.Network;
-import tobi.reinforcement.problems.Approximate;
-import tobi.reinforcement.problems.XORProblem;
 import tobi.reinforcement.problems.gym.BoxBoxGym;
-import tobi.reinforcement.problems.gym.BoxDiscreteGym;
-import tobi.reinforcement.problems.gym.DiscreteBoxGym;
 
 import java.io.*;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.function.DoubleUnaryOperator;
 
 public class Main {
     private static MyRandom random = new MyRandom();
@@ -23,7 +18,7 @@ public class Main {
 //        private static final Problem PROBLEM = new Square();
 //    private static final Problem PROBLEM = new EqualsProblem(1);
     public static final double MUTATION_RATE = 0.1;
-    public static final int GENERATION_SIZE = 150;
+    public static final int GENERATION_SIZE = 1000;
     //    public static final int GENERATION_SIZE = 10000;
 //    private static final double PARENT_RATIO = 1;
     private static final double PARENT_RATIO = 0.1;
