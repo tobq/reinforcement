@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class Main {
+    private static final String INTERPRETER_ARG_KEY = "i";
     private static MyRandom random = new MyRandom();
     //    private static final DoubleUnaryOperator GOAL_FUNC = x -> x * x - 50;
 //    private static final Approximate PROBLEM = new Approximate(GOAL_FUNC);
@@ -69,7 +70,7 @@ public class Main {
 
         Options options = new Options();
 
-        options.addOption("i", "interpreter", true, "Python interpreter (executable) to be used.");
+        options.addOption(INTERPRETER_ARG_KEY, "interpreter", true, "Python interpreter (executable) to be used.");
 
         options.addOption("b", "base-network", true, "Based network used to generate initial population");
 
@@ -86,9 +87,10 @@ public class Main {
         }
         System.out.println(Arrays.toString((args)));
 
-        final String envId = "BipedalWalker-v3";
+//        final String ENV_ID = "BipedalWalker-v3";
+        final String ENV_ID = "LunarLanderContinuous-v2";
 
-        try (BoxBoxGym PROBLEM = cmd.hasOption('i') ? new BoxBoxGym(envId, cmd.getOptionValue('i')) : new BoxBoxGym(envId)) {
+        try (BoxBoxGym PROBLEM = cmd.hasOption(INTERPRETER_ARG_KEY) ? new BoxBoxGym(ENV_ID, cmd.getOptionValue(INTERPRETER_ARG_KEY)) : new BoxBoxGym(ENV_ID)) {
 //        XORProblem PROBLEM = new XORProblem();
 //        {
 //        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("Pong-ram-v0")) {
