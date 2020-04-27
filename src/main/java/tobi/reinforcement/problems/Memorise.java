@@ -16,7 +16,7 @@ public class Memorise {
         network.reset();
         double[] string = new double[digits];
         for (int i = 0; i < digits; i++) {
-            string[i] = random.nextDouble();
+            string[i] = random.nextDouble() * 10 - 5;
         }
         int finalIndex = string.length - 1;
         for (int i = 0; i < finalIndex; i++) {

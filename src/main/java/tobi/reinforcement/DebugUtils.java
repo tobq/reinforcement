@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.function.DoubleUnaryOperator;
 
 public class DebugUtils {
+
     private static void plotChart(ChartPanel chartPanel, Network network, DoubleUnaryOperator goal) {
         final XYSeries h = new XYSeries("Hypothesis");
         final XYSeries f = new XYSeries("Goal");

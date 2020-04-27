@@ -1,6 +1,5 @@
 package tobi.reinforcement.network;
 
-import tobi.gym.Box;
 import tobi.reinforcement.Utils;
 import tobi.reinforcement.network.neuron.*;
 import tobi.reinforcement.Main;
@@ -17,6 +16,7 @@ public class Network {
     // todo: MERGE VAR OUTPUTS + NEURON INPUTS INTO ONE OBJECT, AND USE A NEURONENTRY OBJECT FOR in/out
     public final Map<Neuron, Synapse[]> neuronInputs;
     private final Map<Neuron, Set<Variable>> varOutputs;
+    private final Map<T1, Double> t1Values;
     private final Map<Constant, Double> constValues;
     private final Map<Variable, Double> varValues;
     private HashMap<Input, Double> inputValues;
@@ -29,6 +29,7 @@ public class Network {
         neuronInputs = new HashMap<>();
         varOutputs = new HashMap<>();
         varValues = new HashMap<>();
+        t1Values = new HashMap<>();
         inputValues = new HashMap<>();
         constValues = new HashMap<>();
 
@@ -77,6 +78,7 @@ public class Network {
 
         varValues = new HashMap<>();
         inputValues = new HashMap<>();
+        t1Values = new HashMap<>();
 
         reset();
         neuronInputs.keySet().retainAll(getNeurons(neuronInputs, inputs, outputs));
@@ -167,7 +169,7 @@ public class Network {
         if (start == end) return true;
 //        if (!neuronInputs.containsKey(end)) return false;
         for (Synapse synapse : neuronInputs.get(end)) {
-            if (synapse==null) continue;
+            if (synapse == null) continue;
             if (isReachable(start, synapse.getNeuron(), neuronInputs)) return true;
         }
         return false;
@@ -201,14 +203,17 @@ public class Network {
      * Resets vars
      */
     public void reset() {
-        for (Variable var : getVars(this.neuronInputs, inputs, outputs)) {
-            setVar(var, 0);
-        }
-
+        for (Neuron neuron : getNeurons(neuronInputs, inputs, outputs)) {
+            if (neuron instanceof Variable) {
+                varValues.put((Variable) neuron, 0D);
+            } else if (neuron instanceof T1) {
+                t1Values.put((T1) neuron, 0D);
+            }
 //        // TODO: INVESTIGATE IF NECESSARY TO RESET INPUTS
 //        for (Input input : inputs) {
 //            inputValues.put(input, 0D);
 //        }
+        }
     }
 
     private Set<Neuron> getInputable(Neuron neuron, Map<Neuron, Synapse[]> neuronInputs) {
@@ -413,6 +418,7 @@ public class Network {
             // copy variable outputs
             final HashSet<Variable> outputs = new HashSet<>(this.varOutputs.get(neuron));
 
+//            TODO: EXPERIMENT WITH ALLOWING VARIABLE/CONST OUTPUT TO VARIABLE
             if (!(neuron instanceof Variable || neuron instanceof Constant)) {
                 while (Utils.shouldMutate(mutationRate)) {
                     // add existing var as output
@@ -543,7 +549,7 @@ public class Network {
 
     public void updateVarOutputs(Neuron neuron, double value) {
         for (Variable variable : getVarOutputs(neuron))
-            setVar(variable, value);
+            varValues.put(variable, value);
     }
 
     public Set<Variable> getVarOutputs(Neuron neuron) {
@@ -553,10 +559,6 @@ public class Network {
 
     public double getVar(Variable variable) {
         return varValues.get(variable);
-    }
-
-    private void setVar(Variable variable, double value) {
-        varValues.put(variable, value);
     }
 
     public double getConst(Constant constant) {
@@ -725,5 +727,12 @@ public class Network {
 
     public double getInput(Input input) {
         return inputValues.get(input);
+    }
+
+
+    public double updateT1(T1 t1, double value) {
+        double lastValue = t1Values.get(t1);
+        t1Values.put(t1, value);
+        return lastValue;
     }
 }

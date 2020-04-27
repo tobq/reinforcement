@@ -26,7 +26,10 @@ public class Utils {
                 new Relu(),
                 new Sigmoid(),
                 new Max(),
+
+                new T1(),
                 new Variable(), // TODO: >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> UNCOMMENT RNN
+
                 new Constant()
         };
     }
@@ -88,7 +91,11 @@ public class Utils {
     }
 
     public static <T> T randomElement(T... array) {
-        return array[random.nextInt(array.length)];
+        return array[randomIndex(array)];
+    }
+
+    public static <T> int randomIndex(T... array) {
+        return random.nextInt(array.length);
     }
 
     public static <T> T logRandomElement(T... array) {

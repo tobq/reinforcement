@@ -1,7 +1,10 @@
 package tobi.reinforcement.problems;
 
 import tobi.reinforcement.Problem;
+import tobi.reinforcement.Utils;
 import tobi.reinforcement.network.Network;
+
+import java.util.Arrays;
 
 public class SequenceProblem implements Problem<Integer[], Integer> {
     public static final Integer[][] DATA_SET;
@@ -51,7 +54,7 @@ public class SequenceProblem implements Problem<Integer[], Integer> {
         }
 
         if (Double.isNaN(fitness)) return Double.NEGATIVE_INFINITY;
-        return fitness;
+        return fitness / DATA_SET.length;
     }
 
     @Override

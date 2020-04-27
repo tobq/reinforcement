@@ -2,8 +2,11 @@ package tobi.reinforcement;
 
 import org.apache.commons.cli.*;
 import tobi.reinforcement.network.Network;
+import tobi.reinforcement.problems.Memorise;
+import tobi.reinforcement.problems.SequenceProblem;
 import tobi.reinforcement.problems.XORProblem;
 import tobi.reinforcement.problems.gym.BoxBoxGym;
+import tobi.reinforcement.problems.gym.BoxDiscreteGym;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -15,17 +18,17 @@ public class Main {
     private static MyRandom random = new MyRandom();
     //    private static final DoubleUnaryOperator GOAL_FUNC = x -> x * x - 50;
 //    private static final Approximate PROBLEM = new Approximate(GOAL_FUNC);
-    //    private static final Memorise PROBLEM = new Memorise(4);
-    //    private static final Problem PROBLEM = new SequenceProblem();
-//        private static final Problem PROBLEM = new Square();
+//    private static final Memorise PROBLEM = new Memorise(4);
+//    private static final Problem PROBLEM = new SequenceProblem();
+    //        private static final Problem PROBLEM = new Square();
 //    private static final Problem PROBLEM = new EqualsProblem(1);
-    public static final double MUTATION_RATE = 0.1;
-    public static final int GENERATION_SIZE = 10000;
+    public static final double MUTATION_RATE = 0.2;
+    public static final int GENERATION_SIZE = 1000;
     //    public static final int GENERATION_SIZE = 10000;
 //    private static final double PARENT_RATIO = 1;
     private static final double PARENT_RATIO = 0.1;
     public static final int PARENT_COUNT = (int) Math.ceil(GENERATION_SIZE * PARENT_RATIO);
-    public static final long MAX_GENERATION_COUNT = Long.MAX_VALUE;
+    public static final long MAX_GENERATION_COUNT = 999999;
     private static final boolean ASEXUAL_REPRODUCTION = false;
     private static final boolean COPY_CROSSOVERS = true;
     private static final boolean CLONE_PARENTS = true;
@@ -65,9 +68,12 @@ public class Main {
      * <p>
      * implemented my own GYM wrapper
      * - implemented threading
+     * <p>
+     * CHANGE VARIABLES FOR TIME STEP
+     * COMPARE EFFECTIVENESS OF BOTH
      */
     public static void main(String... args) throws InterruptedException, IOException, URISyntaxException, ExecutionException {
-
+// TODO: MAKE OPTIONAL PARAMS FOR HARD-CODED ALGORITHM ARGUMENTS
         Options options = new Options();
 
         options.addOption(INTERPRETER_ARG_KEY, "interpreter", true, "Python interpreter (executable) to be used.");
@@ -87,9 +93,8 @@ public class Main {
         }
         System.out.println(Arrays.toString((args)));
 
-//        final String ENV_ID = "BipedalWalker-v3";
-        final String ENV_ID = "LunarLanderContinuous-v2";
-
+        final String ENV_ID = "BipedalWalker-v3";
+//        final String ENV_ID = "LunarLanderContinuous-v2";
         try (BoxBoxGym PROBLEM = cmd.hasOption(INTERPRETER_ARG_KEY) ? new BoxBoxGym(ENV_ID, cmd.getOptionValue(INTERPRETER_ARG_KEY)) : new BoxBoxGym(ENV_ID)) {
 //        XORProblem PROBLEM = new XORProblem();
 //        {
@@ -151,7 +156,8 @@ public class Main {
                     ArrayList<Callable<Double>> tasks = new ArrayList<>();
                     for (Network network : generation) {
                         int finalSeed = seed;
-                        tasks.add(() -> PROBLEM.test(network, false, /*1,*/ finalSeed));
+                                                tasks.add(() -> PROBLEM.test(network, false, /*1,*/ finalSeed));
+//                        tasks.add(() -> PROBLEM.test(network, finalSeed));
 //                        tasks.add(() -> PROBLEM.test(network));
                     }
                     List<Future<Double>> invokeAll = exec.invokeAll(tasks);
@@ -211,7 +217,7 @@ public class Main {
                             Network b = generation[randomIndexB];
                             Network crossover;
 //                            try {
-                                crossover = Network.crossover(a, b, fitnesses[randomIndexA], fitnesses[randomIndexB]);
+                            crossover = Network.crossover(a, b, fitnesses[randomIndexA], fitnesses[randomIndexB]);
 //                            } catch (StackOverflowError e) {
 //                                DebugUtils.showGraph(a);
 //                                DebugUtils.showGraph(b);
