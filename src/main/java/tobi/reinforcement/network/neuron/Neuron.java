@@ -19,17 +19,17 @@ abstract public class Neuron {
         return value;
     }
 
-    public static InputlessNeuron NULL = new InputlessNeuron() {
-        @Override
-        public String getSymbol() {
-            return "NULL";
-        }
-
-        @Override
-        protected double doGet(Network network) {
-            return 0;
-        }
-    };
+//    public static InputlessNeuron NULL = new InputlessNeuron() {
+//        @Override
+//        public String getSymbol() {
+//            return "NULL";
+//        }
+//
+//        @Override
+//        protected double doGet(Network network) {
+//            return 0;
+//        }
+//    };
 
     protected abstract double doCompute(Network network, double... inputs);
 

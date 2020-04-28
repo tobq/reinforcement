@@ -22,9 +22,9 @@ public class Main {
 //    private static final Problem PROBLEM = new SequenceProblem();
     //        private static final Problem PROBLEM = new Square();
 //    private static final Problem PROBLEM = new EqualsProblem(1);
-    public static final double MUTATION_RATE = 0.2;
-    public static final int GENERATION_SIZE = 1000;
-    //    public static final int GENERATION_SIZE = 10000;
+    public static final double MUTATION_RATE = 0.1;
+//    public static final int GENERATION_SIZE = 1000;
+        public static final int GENERATION_SIZE = 10000;
 //    private static final double PARENT_RATIO = 1;
     private static final double PARENT_RATIO = 0.1;
     public static final int PARENT_COUNT = (int) Math.ceil(GENERATION_SIZE * PARENT_RATIO);
@@ -156,7 +156,7 @@ public class Main {
                     ArrayList<Callable<Double>> tasks = new ArrayList<>();
                     for (Network network : generation) {
                         int finalSeed = seed;
-                                                tasks.add(() -> PROBLEM.test(network, false, /*1,*/ finalSeed));
+                        tasks.add(() -> PROBLEM.test(network, false, /*1,*/ finalSeed));
 //                        tasks.add(() -> PROBLEM.test(network, finalSeed));
 //                        tasks.add(() -> PROBLEM.test(network));
                     }
@@ -180,8 +180,9 @@ public class Main {
                             c = Comparator
                                     .comparingDouble((Integer a) -> fitnesses[a])
                                     .reversed()
-                                    .thenComparingInt(a -> finalGeneration[a].getNeurons().size());
+                                    .thenComparingInt(a -> finalGeneration[a].getComplexity());
                             break;
+                        case FITNESS:
                         default:
                             c = Comparator
                                     .comparingDouble((Integer a) -> fitnesses[a])

@@ -2,7 +2,7 @@ package tobi.reinforcement.network.neuron;
 
 import tobi.reinforcement.network.Network;
 
-public class Divide extends Neuron {
+public  final class Divide extends Neuron {
 
     @Override
     protected double doCompute(Network network, double... inputs) {

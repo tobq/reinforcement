@@ -2,7 +2,7 @@ package tobi.reinforcement.network.neuron;
 
 import tobi.reinforcement.network.Network;
 
-public class Input extends InputlessNeuron {
+public  final class Input extends InputlessNeuron {
     public static final String SYMBOL = "IN";
     private final String ID;
 

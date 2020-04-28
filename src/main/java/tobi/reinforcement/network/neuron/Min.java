@@ -2,7 +2,7 @@ package tobi.reinforcement.network.neuron;
 
 import tobi.reinforcement.network.Network;
 
-public class Min extends Neuron {
+public  final class Min extends Neuron {
     @Override
     protected double doCompute(Network network, double... inputs) {
         return Math.min(inputs[0], inputs[1]);

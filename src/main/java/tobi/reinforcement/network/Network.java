@@ -605,9 +605,11 @@ public class Network {
     }
 
     public static Network crossover(Network a, Network b, double aFitness, double bFitness) {
-        double maxFitness = Math.max(aFitness, bFitness);
-        double aWeight = aFitness / maxFitness;
-        double bWeight = bFitness / maxFitness;
+//        double maxFitness = Math.max(aFitness, bFitness);
+//        double aWeight = aFitness / maxFitness;
+//        double bWeight = bFitness / maxFitness;
+        double aWeight = aFitness;
+        double bWeight = bFitness;
 
         HashMap<Neuron, Synapse[]> newNeuronInputs = new HashMap<>();
         HashMap<Neuron, Set<Variable>> newVarOutputs = new HashMap<>();
@@ -673,11 +675,13 @@ public class Network {
             double bWeight,
             HashMap<Neuron, Synapse[]> newNeuronInputs
     ) {
-        Synapse[] aInputs = a.neuronInputs.get(subject);
-        Synapse[] bInputs = b.neuronInputs.get(subject);
+        if (newNeuronInputs.containsKey(subject)) return;
         int inputCount = subject.getInputCount();
         Synapse[] newInputs = new Synapse[inputCount];
         newNeuronInputs.put(subject, newInputs);
+
+        Synapse[] aInputs = a.neuronInputs.get(subject);
+        Synapse[] bInputs = b.neuronInputs.get(subject);
 
         // TODO: UNION VAR OUTPUTS AND CHECK ALLLLLL LDL DL SDL SLS DL
         // Variable outputs need to be decided on whether there's a variable output
@@ -723,6 +727,13 @@ public class Network {
             }
 //            }
         }
+    }
+
+    public int getComplexity() {
+        return getNeurons()
+                .stream()
+                .mapToInt(Neuron::getInputCount)
+                .sum();
     }
 
     public double getInput(Input input) {

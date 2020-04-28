@@ -2,7 +2,7 @@ package tobi.reinforcement.network.neuron;
 
 import tobi.reinforcement.network.Network;
 
-public class Output extends Neuron {
+public  final class Output extends Neuron {
 
     public static final String SYMBOL = "OUT";
     private final String ID;

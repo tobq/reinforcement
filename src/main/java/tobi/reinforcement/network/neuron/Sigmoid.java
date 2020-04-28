@@ -2,7 +2,7 @@ package tobi.reinforcement.network.neuron;
 
 import tobi.reinforcement.network.Network;
 
-public class Sigmoid extends Neuron {
+public  final class Sigmoid extends Neuron {
     @Override
     protected double doCompute(Network network, double... inputs) {
         final double input = inputs[0];

@@ -2,7 +2,7 @@ package tobi.reinforcement.network.neuron;
 
 import tobi.reinforcement.network.Network;
 
-public class Sin extends Neuron {
+public  final class Sin extends Neuron {
     @Override
     protected double doCompute(Network network, double... inputs) {
         return Math.sin(inputs[0]);

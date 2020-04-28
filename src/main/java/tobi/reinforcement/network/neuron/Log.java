@@ -2,7 +2,7 @@ package tobi.reinforcement.network.neuron;
 
 import tobi.reinforcement.network.Network;
 
-public class Log extends Neuron {
+public final  class Log extends Neuron {
     @Override
     protected double doCompute(Network network, double... inputs) {
         return Math.log(inputs[0]);
