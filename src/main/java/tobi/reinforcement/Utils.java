@@ -11,26 +11,28 @@ public class Utils {
     static Neuron[] getSupportedNeurons() {
         return new Neuron[]{
                 /* NON ESSENTIAL FUNCTIONS */
+                new Constant(),
+
                 new Sin(),
                 new Cos(),
                 new Abs(),
-                new Divide(),
-                new Subtract(),
                 new Log(),
-                new Min(),
-//                new Round(),
-
-                new Add(),
                 new Exp(),
-                new Multiply(),
                 new Relu(),
                 new Sigmoid(),
+                new Tanh(),
+//                new Round(),
+
+                new Divide(),
+                new Subtract(),
+                new Min(),
+                new Add(),
+                new Multiply(),
                 new Max(),
 
                 new T1(),
-                new Variable(), // TODO: >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> UNCOMMENT RNN
+                new Variable() // TODO: >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> UNCOMMENT RNN
 
-                new Constant()
         };
     }
 
