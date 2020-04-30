@@ -1,4 +1,4 @@
-let ARRAY = `LOG_SORT,100,0.01,1,2775
+let rows = `LOG_SORT,100,0.01,1,2775
 TIE_MIN_NEURONS_SORT,100,0.01,1,2514
 FITNESS,100,0.01,1,4882
 LOG_SORT,100,0.02,1,4198
@@ -15,7 +15,7 @@ TIE_MIN_NEURONS_SORT,100,0.16,1,686
 FITNESS,100,0.16,1,659
 LOG_SORT,               100,            0.32,           1,              2036
 TIE_MIN_NEURONS_SORT,           100,            0.32,           1,              747
-FITNESS,                100,            0.32,  
+FITNESS,                100,            0.32,       1,              1054
 LOG_SORT,200,0.01,1,2533
 TIE_MIN_NEURONS_SORT,200,0.01,1,1571
 FITNESS,200,0.01,1,2420
@@ -102,19 +102,33 @@ TIE_MIN_NEURONS_SORT,           3200,           0.08,           1,              
 FITNESS,                3200,           0.08,           1,              5158
 LOG_SORT,               3200,           0.16,           1,              5854
 TIE_MIN_NEURONS_SORT,           3200,           0.16,           1,              5766
-FITNESS,                3200,           0.16,           1,              4838         1,              1054
+FITNESS,                3200,           0.16,           1,              4838    
 LOG_SORT,               3200,           0.32,           1,              6684
 TIE_MIN_NEURONS_SORT,           3200,           0.32,           1,              5425
 FITNESS,                3200,           0.32,           1,              5550`
     .split("\n")
-    .map(string => {
-        let row = string.split(",").map(x => x.trim());
-        // return row[4]
-        row[0] = row[0].replace(/_/g, " ");
-        row[4] /= 1000;
-        // row[3] *= 100;
-        row.splice(3, 1)
-        return row.join(" & ");
-    });
-// Math.min.apply(null, ARRAY);
-copy(ARRAY.join(" \\\\\n"));
+    .map(string => string.split(",").map(x => x.trim()));
+// let ARRAY = rows
+//     .map(row => {
+//         // return row[4]
+//         row[0] = row[0].replace(/_/g, " ");
+//         row[4] /= 1000;
+//         // row[3] *= 100;
+//         row.splice(3, 1)
+//         return row.join(" & ");
+//     });
+// // Math.min.apply(null, ARRAY);
+// copy(ARRAY.join(" \\\\\n"));
+let collectedTimes = rows.reduce((p, row) => {
+    let pclone = {...p};
+    pclone[row[2]].push(parseInt(row[4]));
+    return pclone;
+}, {0.01: [], 0.02: [], 0.04: [],0.08: [], 0.16: [], 0.32: []});
+
+let averageTimes = {};
+for (let sort in collectedTimes) {
+    let times = collectedTimes[sort];
+    let sum = times.reduce((p, c) => p + c, 0);
+    averageTimes[sort] = sum / times.length
+}
+

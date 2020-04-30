@@ -719,9 +719,9 @@ public class Network {
                         if (newNeuronInputs.containsKey(bInput) && isReachable(subject, bInput, newNeuronInputs))
                             newSynapse = aSynapse;
                         else
-//                            newSynapse = aWeight * aSynapse.getStrength() > bWeight * bSynapse.getStrength() ? aSynapse : bSynapse;
+                            newSynapse = aWeight * aSynapse.getStrength() > bWeight * bSynapse.getStrength() ? aSynapse : bSynapse;
 //                            newSynapse = Utils.random.nextBoolean() ? aSynapse : bSynapse;
-                            newSynapse = bSynapse;
+//                            newSynapse = bSynapse;
 //                        >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> TODO: STRENGTH BASED
                     }
 
@@ -751,7 +751,7 @@ public class Network {
         }
     }
 
-    public int getComplexity() {
+    public int getSynapseCount() {
         return getNeurons()
                 .stream()
                 .mapToInt(Neuron::getInputCount)
