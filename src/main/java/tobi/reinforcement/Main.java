@@ -115,20 +115,20 @@ public class Main {
 
 //            int SKIP_COUNTER = 0;
 //            int SKIPS = 0;
-//        for (int GENERATION_SIZE_I = 0; GENERATION_SIZE_I < 7; GENERATION_SIZE_I++) {
-//            int GENERATION_SIZE = (int) (100 * Math.pow(2, GENERATION_SIZE_I));
+        for (int GENERATION_SIZE_I = 0; GENERATION_SIZE_I < 7; GENERATION_SIZE_I++) {
+            int GENERATION_SIZE = (int) (100 * Math.pow(2, GENERATION_SIZE_I));
 //        for (int PROGRAM_LOOPS = 0; PROGRAM_LOOPS < 1000; PROGRAM_LOOPS++)
-        {
+//        {
             {
-                int GENERATION_SIZE = 150;
+//                int GENERATION_SIZE = 150;
                 ExecutorService exec = Executors.newFixedThreadPool(GENERATION_SIZE);
                 final int PARENT_COUNT = (int) Math.ceil(GENERATION_SIZE * PARENT_RATIO);
 
 //            for (int MURATION_RATE_I = 0; MURATION_RATE_I < 5; MURATION_RATE_I++)
-                for (double MUTATION_RATE = 0.1; MUTATION_RATE < 0.35; MUTATION_RATE += 0.01) {
+                for (double MUTATION_RATE = 0.15; MUTATION_RATE < 0.3; MUTATION_RATE += 0.01) {
 //                    double MUTATION_RATE = 0.01 * Math.pow(2, MURATION_RATE_I);
 //                {
-//                    double MUTATION_RATE = 0.16;
+//                    double MUTATION_RATE = 0.25;
 //                for (SortMethod SORT_METHOD : SortMethod.values()) {
                     {
                         SortMethod SORT_METHOD = SortMethod.TIE_MIN_NEURONS_SORT;
