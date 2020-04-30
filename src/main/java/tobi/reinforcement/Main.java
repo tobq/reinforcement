@@ -121,10 +121,10 @@ public class Main {
 //                int GENERATION_SIZE = 100;
                 ExecutorService exec = Executors.newFixedThreadPool(GENERATION_SIZE);
                 final int PARENT_COUNT = (int) Math.ceil(GENERATION_SIZE * PARENT_RATIO);
-                for (int MURATION_RATE_I = 0; MURATION_RATE_I < 5; MURATION_RATE_I++) {
-                    double MUTATION_RATE = 0.01 * Math.pow(2, MURATION_RATE_I);
-//                {
-//                    double MUTATION_RATE = 0.16;
+//                for (int MURATION_RATE_I = 0; MURATION_RATE_I < 5; MURATION_RATE_I++) {
+//                    double MUTATION_RATE = 0.01 * Math.pow(2, MURATION_RATE_I);
+                {
+                    double MUTATION_RATE = 0.32;
                     for (SortMethod SORT_METHOD : SortMethod.values()) {
 //                    {
 //                        SortMethod SORT_METHOD = SortMethod.LOG_SORT;
