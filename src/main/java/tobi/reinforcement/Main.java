@@ -179,9 +179,9 @@ public class Main {
                                     ArrayList<Callable<Double>> tasks = new ArrayList<>();
                                     for (Network network : generation) {
                                         int finalSeed = seed;
-                                        tasks.add(() -> PROBLEM.test(network, false, /*1,*/ finalSeed));
+//                                        tasks.add(() -> PROBLEM.test(network, false, /*1,*/ finalSeed));
 //                                    tasks.add(() -> PROBLEM.test(network, finalSeed));
-//                        tasks.add(() -> PROBLEM.test(network));
+                        tasks.add(() -> PROBLEM.test(network));
                                     }
                                     List<Future<Double>> invokeAll = exec.invokeAll(tasks);
                                     for (int i = 0; i < invokeAll.size(); i++) {
