@@ -113,15 +113,21 @@ public class Main {
 //        jFrame.setContentPane(chartPanel);
 
             int TRIALS = 10;
-            int SKIP_COUNTER = 65;
+            int SKIP_COUNTER = 83;
             int SKIPS = 0;
             for (int GENERATION_SIZE_I = 0; GENERATION_SIZE_I < 7; GENERATION_SIZE_I++) {
                 int GENERATION_SIZE = (int) (100 * Math.pow(2, GENERATION_SIZE_I));
+//            {
+//                int GENERATION_SIZE = 100;
                 ExecutorService exec = Executors.newFixedThreadPool(GENERATION_SIZE);
                 final int PARENT_COUNT = (int) Math.ceil(GENERATION_SIZE * PARENT_RATIO);
                 for (int MURATION_RATE_I = 0; MURATION_RATE_I < 5; MURATION_RATE_I++) {
                     double MUTATION_RATE = 0.01 * Math.pow(2, MURATION_RATE_I);
+//                {
+//                    double MUTATION_RATE = 0.16;
                     for (SortMethod SORT_METHOD : SortMethod.values()) {
+//                    {
+//                        SortMethod SORT_METHOD = SortMethod.LOG_SORT;
                         if (SKIPS < SKIP_COUNTER) {
                             SKIPS++;
                             continue;
@@ -170,23 +176,23 @@ public class Main {
                                 for (int g = 0; g < MAX_GENERATION_COUNT; g++) {
                                     double[] fitnesses = new double[generation.length];
 
-                                    ArrayList<Callable<Double>> tasks = new ArrayList<>();
-                                    for (Network network : generation) {
-                                        int finalSeed = seed;
-                                        tasks.add(() -> PROBLEM.test(network, false, /*1,*/ finalSeed));
-//                                    tasks.add(() -> PROBLEM.test(network, finalSeed));
-//                        tasks.add(() -> PROBLEM.test(network));
-                                    }
-                                    List<Future<Double>> invokeAll = exec.invokeAll(tasks);
-                                    for (int i = 0; i < invokeAll.size(); i++) {
-                                        fitnesses[i] = invokeAll.get(i).get();
-                                    }
-//                                for (int i = 0; i < generation.length; i++) {
-//                                    Network network = generation[i];
-//                                    fitnesses[i] = PROBLEM.test(network, false, seed);
-////                        fitnesses[i] = PROBLEM.test(network, seed);
-////                        fitnesses[i] = PROBLEM.test(network);
-//                                }
+//                                    ArrayList<Callable<Double>> tasks = new ArrayList<>();
+//                                    for (Network network : generation) {
+//                                        int finalSeed = seed;
+//                                        tasks.add(() -> PROBLEM.test(network, false, /*1,*/ finalSeed));
+////                                    tasks.add(() -> PROBLEM.test(network, finalSeed));
+////                        tasks.add(() -> PROBLEM.test(network));
+//                                    }
+//                                    List<Future<Double>> invokeAll = exec.invokeAll(tasks);
+//                                    for (int i = 0; i < invokeAll.size(); i++) {
+//                                        fitnesses[i] = invokeAll.get(i).get();
+//                                    }
+                                for (int i = 0; i < generation.length; i++) {
+                                    Network network = generation[i];
+                                    fitnesses[i] = PROBLEM.test(network, false, seed);
+//                        fitnesses[i] = PROBLEM.test(network, seed);
+//                        fitnesses[i] = PROBLEM.test(network);
+                                }
 
                                     Integer[] order = new Integer[generation.length];
                                     for (int i = 0; i < generation.length; i++) order[i] = i;
@@ -268,7 +274,7 @@ public class Main {
                             long TRAINING_TIME = System.currentTimeMillis() - TRAINING_START;
 //                            System.out.println("FINISHED = " + FINISHED / TRIALS * 100 + "%");
 //                            System.out.println("AVERAGE TRAINING TIME = " + TRAINING_TIME / TRIALS + "ms\n\n\n");
-                            System.out.println(SORT_METHOD + "," + GENERATION_SIZE + "," + MUTATION_RATE + "," + FINISHED / TRIALS + "," + TRAINING_TIME / TRIALS);
+                            System.out.println(SORT_METHOD + ",\t\t" + GENERATION_SIZE + ",\t\t" + MUTATION_RATE + ",\t\t" + FINISHED / TRIALS + ",\t\t" + TRAINING_TIME / TRIALS);
                         }
                     }
                 }
