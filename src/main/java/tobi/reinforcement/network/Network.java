@@ -1,5 +1,6 @@
 package tobi.reinforcement.network;
 
+import tobi.reinforcement.DebugUtils;
 import tobi.reinforcement.Utils;
 import tobi.reinforcement.network.neuron.*;
 import tobi.reinforcement.Main;
@@ -167,13 +168,29 @@ public class Network {
      */
     public static boolean isReachable(Neuron start, Neuron end, Map<Neuron, Synapse[]> neuronInputs) {
         if (start == end) return true;
-//        if (!neuronInputs.containsKey(end)) return false;
+
         for (Synapse synapse : neuronInputs.get(end)) {
-            if (synapse == null) continue;
-            if (isReachable(start, synapse.getNeuron(), neuronInputs)) return true;
+            if (synapse != null) {
+                Neuron intermediate = synapse.getNeuron();
+                if (isReachable(start, intermediate, neuronInputs)) return true;
+            }
         }
+
         return false;
     }
+
+    public int getHiddenLayerSize() {
+        return getNeurons().size() - getInputCount() - getOutputCount();
+    }
+
+    public int getInputCount() {
+        return inputs.length;
+    }
+
+    public int getOutputCount() {
+        return outputs.length;
+    }
+
 
     /**
      * @param start
@@ -193,7 +210,7 @@ public class Network {
             if (call == start) return true;
             reachable.add(call);
             for (Synapse synapse : neuronInputs.get(call)) {
-                calls.add(synapse.getNeuron());
+                if (synapse != null) calls.add(synapse.getNeuron());
             }
         }
         return false;
@@ -232,7 +249,7 @@ public class Network {
 
 //    }
 
-    private Set<Neuron> complement(Set<Neuron> neurons, Map<Neuron, Synapse[]> neuronInputs) {
+    public Set<Neuron> complement(Set<Neuron> neurons, Map<Neuron, Synapse[]> neuronInputs) {
         final Set<Neuron> universe = getNeurons(neuronInputs, inputs, outputs);
         universe.removeAll(neurons);
         return universe;
@@ -369,9 +386,8 @@ public class Network {
             inputValues.put(this.inputs[i], inputs[i]);
 
         double[] result = new double[outputs.length];
-        for (int i = 0; i < outputs.length; i++) {
+        for (int i = 0; i < outputs.length; i++)
             result[i] = outputs[i].compute(this);
-        }
         return result;
     }
 
@@ -381,10 +397,6 @@ public class Network {
 
     public Network clone() {
         return copy(0);
-    }
-
-    public Network copy() {
-        return copy(Main.MUTATION_RATE);
     }
 
     public Network copy(double mutationRate) {
@@ -686,6 +698,7 @@ public class Network {
         // TODO: UNION VAR OUTPUTS AND CHECK ALLLLLL LDL DL SDL SLS DL
         // Variable outputs need to be decided on whether there's a variable output
 
+
         if (a.neuronInputs.containsKey(subject)) {
             if (b.neuronInputs.containsKey(subject)) {
 //                TODO: MAKE CHECK FOR whether current subject is in both networks INSTANCE-TOLERANT
@@ -697,12 +710,21 @@ public class Network {
                     final Synapse aSynapse = aInputs[i];
                     final Synapse bSynapse = bInputs[i];
                     Synapse newSynapse;
-                    if (newNeuronInputs.containsKey(aSynapse.getNeuron()) && isReachable(subject, aSynapse.getNeuron(), newNeuronInputs))
+
+                    Neuron aInput = aSynapse.getNeuron();
+                    if (newNeuronInputs.containsKey(aInput) && isReachable(subject, aInput, newNeuronInputs))
                         newSynapse = bSynapse;
-                    else if (newNeuronInputs.containsKey(bSynapse.getNeuron()) && isReachable(subject, bSynapse.getNeuron(), newNeuronInputs))
-                        newSynapse = aSynapse;
-                    else
-                        newSynapse = aWeight * aSynapse.getStrength() > bWeight * bSynapse.getStrength() ? aSynapse : bSynapse;
+                    else {
+                        Neuron bInput = bSynapse.getNeuron();
+                        if (newNeuronInputs.containsKey(bInput) && isReachable(subject, bInput, newNeuronInputs))
+                            newSynapse = aSynapse;
+                        else
+//                            newSynapse = aWeight * aSynapse.getStrength() > bWeight * bSynapse.getStrength() ? aSynapse : bSynapse;
+//                            newSynapse = Utils.random.nextBoolean() ? aSynapse : bSynapse;
+                            newSynapse = bSynapse;
+//                        >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> TODO: STRENGTH BASED
+                    }
+
 
                     newInputs[i] = newSynapse;
                     selectInputs(newSynapse.getNeuron(), a, b, aWeight, bWeight, newNeuronInputs);

@@ -8,8 +8,8 @@ import java.util.Arrays;
 
 public class SequenceProblem implements Problem<Integer[], Integer> {
     public static final Integer[][] DATA_SET;
-    private static final int SEQUENCE_LENGTH = 8;
-    private static final int MAX_DIFF = 2;
+    private static final int SEQUENCE_LENGTH = 4;
+    private static final int MAX_DIFF = 8;
     private static final int MAX_DIFF_SQUARED = MAX_DIFF * MAX_DIFF;
 
     static {
