@@ -24,7 +24,7 @@ public class Main {
 //    public static final double MUTATION_RATE = 0.1;
 //    public static final int GENERATION_SIZE = 250;
 //    private static final SortMethod SORT_METHOD = SortMethod.TIE_MIN_NEURONS_SORT;
-    public static final long MAX_GENERATION_COUNT = 1000000;
+    public static final long MAX_GENERATION_COUNT = 100000;
     //        public static final int GENERATION_SIZE = 10000;
 //    private static final double PARENT_RATIO = 1;
     private static final double PARENT_RATIO = 0.1;
@@ -136,7 +136,7 @@ public class Main {
                         long TRAINING_START = System.currentTimeMillis();
                         try (PrintWriter fileWriter = new PrintWriter(new FileWriter(TRAINING_START + ".csv"))) {
                             for (String setting : CONFIG) {
-                                System.out.println(setting);
+//                                System.out.println(setting);
                                 fileWriter.println("#" + setting);
                             }
 
@@ -261,10 +261,10 @@ public class Main {
                                 }
                             }
                             long TRAINING_TIME = System.currentTimeMillis() - TRAINING_START;
-                            System.out.println("FINISHED = " + FINISHED / TRIALS * 100 + "%");
-                            System.out.println("AVERAGE TRAINING TIME = " + TRAINING_TIME / TRIALS + "ms\n\n\n");
+//                            System.out.println("FINISHED = " + FINISHED / TRIALS * 100 + "%");
+//                            System.out.println("AVERAGE TRAINING TIME = " + TRAINING_TIME / TRIALS + "ms\n\n\n");
+                            System.out.println(SORT_METHOD + "," + GENERATION_SIZE + "," + MUTATION_RATE + "," + FINISHED / TRIALS + "," + TRAINING_TIME / TRIALS);
                         }
-
                     }
                 }
             }
