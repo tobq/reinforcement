@@ -113,12 +113,18 @@ public class Main {
 //        jFrame.setContentPane(chartPanel);
 
             int TRIALS = 10;
+            int SKIP_COUNTER = 45;
+            int SKIPS = 0;
             for (int GENERATION_SIZE_I = 0; GENERATION_SIZE_I < 7; GENERATION_SIZE_I++) {
                 int GENERATION_SIZE = (int) (100 * Math.pow(2, GENERATION_SIZE_I));
                 final int PARENT_COUNT = (int) Math.ceil(GENERATION_SIZE * PARENT_RATIO);
                 for (int MURATION_RATE_I = 0; MURATION_RATE_I < 5; MURATION_RATE_I++) {
                     double MUTATION_RATE = 0.01 * Math.pow(2, MURATION_RATE_I);
                     for (SortMethod SORT_METHOD : SortMethod.values()) {
+                        if (SKIPS < SKIP_COUNTER) {
+                            SKIPS++;
+                            continue;
+                        }
                         MyRandom random = new MyRandom(0);
 
 
