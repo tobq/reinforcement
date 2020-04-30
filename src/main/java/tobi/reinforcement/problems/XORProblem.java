@@ -10,7 +10,8 @@ public class XORProblem implements Problem<Integer[], Integer> {
             for (int j = 0; j < 2; j++) {
                 double classification = network.compute(i, j)[0];
                 int label = i == j ? 0 : 1;
-                fitness += 1 - Math.abs(classification - label);
+//                fitness += 1 - Math.abs(classification - label);
+                fitness -= Math.abs(classification - label);
             }
         if (Double.isNaN(fitness)) return Double.NEGATIVE_INFINITY;
         return fitness;

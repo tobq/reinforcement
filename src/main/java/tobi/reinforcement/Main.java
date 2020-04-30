@@ -21,7 +21,7 @@ public class Main {
 //    public static final double MUTATION_RATE = 0.1;
 //    public static final int GENERATION_SIZE = 250;
 //    private static final SortMethod SORT_METHOD = SortMethod.TIE_MIN_NEURONS_SORT;
-    public static final long MAX_GENERATION_COUNT = 10000;
+    public static final long MAX_GENERATION_COUNT = 500;
     //        public static final int GENERATION_SIZE = 10000;
 //    private static final double PARENT_RATIO = 1;
     private static final double PARENT_RATIO = 0.1;
@@ -30,7 +30,8 @@ public class Main {
     private static final boolean CLONE_PARENTS = true;
 
     private static final boolean STOP_WHEN_FINISHED = true;
-    private static final double THRESHOLD_FITNESS_FINISHED = 0;
+    //    private static final double THRESHOLD_FITNESS_FINISHED = 3.9;
+    private static final double THRESHOLD_FITNESS_FINISHED = -0.158114;
 
     /**
      * Started with forward-fed network
@@ -95,8 +96,8 @@ public class Main {
 //        try (BoxBoxGym PROBLEM = cmd.hasOption(INTERPRETER_ARG_KEY) ? new BoxBoxGym(ENV_ID, cmd.getOptionValue(INTERPRETER_ARG_KEY)) : new BoxBoxGym(ENV_ID)) {
 //        final String ENV_ID = "CartPole-v1";
 //        try (BoxDiscreteGym PROBLEM = cmd.hasOption(INTERPRETER_ARG_KEY) ? new BoxDiscreteGym(ENV_ID, cmd.getOptionValue(INTERPRETER_ARG_KEY)) : new BoxDiscreteGym(ENV_ID)) {
-//        XORProblem PROBLEM = new XORProblem();
-        Memorise PROBLEM = new Memorise(5);
+        XORProblem PROBLEM = new XORProblem();
+//        Memorise PROBLEM = new Memorise(5);
 //        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("Pong-ram-v0")) {
 //        try (BoxBoxGym PROBLEM = new BoxBoxGym("LunarLanderContinuous-v2")) {
 //        try (DiscreteBoxGym PROBLEM = new DiscreteBoxGym("HotterColder-v0")) {
@@ -116,92 +117,97 @@ public class Main {
 //            int SKIPS = 0;
 //        for (int GENERATION_SIZE_I = 0; GENERATION_SIZE_I < 7; GENERATION_SIZE_I++) {
 //            int GENERATION_SIZE = (int) (100 * Math.pow(2, GENERATION_SIZE_I));
+//        for (int PROGRAM_LOOPS = 0; PROGRAM_LOOPS < 1000; PROGRAM_LOOPS++)
         {
-            int GENERATION_SIZE = 150;
-            ExecutorService exec = Executors.newFixedThreadPool(GENERATION_SIZE);
-            final int PARENT_COUNT = (int) Math.ceil(GENERATION_SIZE * PARENT_RATIO);
-            for (int MURATION_RATE_I = 0; MURATION_RATE_I < 5; MURATION_RATE_I++) {
-                double MUTATION_RATE = 0.01 * Math.pow(2, MURATION_RATE_I);
-//            {
-//                double MUTATION_RATE = 0.15;
-                for (SortMethod SORT_METHOD : SortMethod.values()) {
+            {
+                int GENERATION_SIZE = 150;
+                ExecutorService exec = Executors.newFixedThreadPool(GENERATION_SIZE);
+                final int PARENT_COUNT = (int) Math.ceil(GENERATION_SIZE * PARENT_RATIO);
+
+//            for (int MURATION_RATE_I = 0; MURATION_RATE_I < 5; MURATION_RATE_I++)
+                for (double MUTATION_RATE = 0.1; MUTATION_RATE < 0.35; MUTATION_RATE += 0.01) {
+//                    double MUTATION_RATE = 0.01 * Math.pow(2, MURATION_RATE_I);
 //                {
-//                    SortMethod SORT_METHOD = SortMethod.TIE_MIN_NEURONS_SORT;
+//                    double MUTATION_RATE = 0.16;
+//                for (SortMethod SORT_METHOD : SortMethod.values()) {
+                    {
+                        SortMethod SORT_METHOD = SortMethod.TIE_MIN_NEURONS_SORT;
 //                        if (SKIPS < SKIP_COUNTER) {
 //                            SKIPS++;
 //                            continue;
 //                        }
 
 
-                    String[] CONFIG = {
-                            "PROBLEM = " + PROBLEM.toString(),
-                            "MUTATION_RATE = " + MUTATION_RATE,
-                            "CLONE_PARENTS = " + CLONE_PARENTS,
-                            "GENERATION_SIZE = " + GENERATION_SIZE,
-                            "PARENT_COUNT = " + PARENT_COUNT,
-                            "ASEXUAL_REPRODUCTION = " + ASEXUAL_REPRODUCTION,
-                            "COPY_CROSSOVERS = " + COPY_CROSSOVERS,
-                            "CLONE_PARENTS = " + CLONE_PARENTS,
-                            "SORT_METHOD = " + SORT_METHOD
-                    };
-                    System.out.println("Sort:" + SORT_METHOD + "\tSize:" + GENERATION_SIZE + "\tMut:" + MUTATION_RATE);
-                    try (PrintWriter fileWriter = new PrintWriter(new FileWriter(System.currentTimeMillis() + ".csv"))) {
-                        for (String setting : CONFIG) {
+                        String[] CONFIG = {
+                                "PROBLEM = " + PROBLEM.toString(),
+                                "MUTATION_RATE = " + MUTATION_RATE,
+                                "CLONE_PARENTS = " + CLONE_PARENTS,
+                                "GENERATION_SIZE = " + GENERATION_SIZE,
+                                "PARENT_COUNT = " + PARENT_COUNT,
+                                "ASEXUAL_REPRODUCTION = " + ASEXUAL_REPRODUCTION,
+                                "COPY_CROSSOVERS = " + COPY_CROSSOVERS,
+                                "CLONE_PARENTS = " + CLONE_PARENTS,
+                                "SORT_METHOD = " + SORT_METHOD
+                        };
+                        System.out.println("Sort:" + SORT_METHOD + "\tSize:" + GENERATION_SIZE + "\tMut:" + MUTATION_RATE);
+                        try (PrintWriter fileWriter = new PrintWriter(new FileWriter(System.currentTimeMillis() + ".csv"))) {
+                            for (String setting : CONFIG) {
 //                            System.out.println(setting);
-                            fileWriter.println("#" + setting);
-                        }
+                                fileWriter.println("#" + setting);
+                            }
 
-                        int inputCount = PROBLEM.getInstanceLength();
-                        int outputCount = PROBLEM.getLabelLength();
+                            int inputCount = PROBLEM.getInstanceLength();
+                            int outputCount = PROBLEM.getLabelLength();
 
 
-                        MyRandom random = new MyRandom(0);
-                        int seed = random.nextPositiveInt();
-                        int RUNS_ALLOWED = 10;
-                        long[] RUN_GENERATIONS_TAKENS = new long[RUNS_ALLOWED];
-                        long[] RUN_TIME_TAKENS = new long[RUNS_ALLOWED];
-                        int[] RUN_SYNAPSE_COUNTS = new int[RUNS_ALLOWED];
-                        int[] RUN_FINISHES = new int[RUNS_ALLOWED];
+                            MyRandom random = new MyRandom();
+                            int seed = random.nextPositiveInt();
+                            int RUNS_ALLOWED = 100;
+                            long[] RUN_GENERATIONS_TAKENS = new long[RUNS_ALLOWED];
+                            int[] RUN_HIDDEN_NODE_COUNTS = new int[RUNS_ALLOWED];
+                            long[] RUN_TIME_TAKENS = new long[RUNS_ALLOWED];
+                            int[] RUN_SYNAPSE_COUNTS = new int[RUNS_ALLOWED];
+                            int[] RUN_FINISHES = new int[RUNS_ALLOWED];
 
-                        for (int RUN_I = 0; RUN_I < RUNS_ALLOWED; RUN_I++) {
-                            long RUN_GENERATIONS_TAKEN = MAX_GENERATION_COUNT;
-                            long TIME_TAKEN = Long.MAX_VALUE;
-                            long GENERATION_START = System.currentTimeMillis();
-                            boolean FINISHED = false;
+                            for (int RUN_I = 0; RUN_I < RUNS_ALLOWED; RUN_I++) {
+                                long RUN_GENERATIONS_TAKEN = MAX_GENERATION_COUNT;
+                                long TIME_TAKEN = Long.MAX_VALUE;
+                                long GENERATION_START = System.currentTimeMillis();
+                                boolean FINISHED = false;
 //                            System.out.println("RUN_I = " + RUN_I);
 //                            {
 
 
-                            int g = 0;
-                            Network fittestNetwork = null;
-                            Network[] generation = new Network[GENERATION_SIZE];
+                                int g = 0;
+                                Network fittestNetwork = null;
+                                Network[] generation = new Network[GENERATION_SIZE];
 
-                            if (cmd.hasOption('b')) {
-                                Network baseNetwork = Network.parse(cmd.getOptionValue('b'));
-                                generation[0] = baseNetwork.clone();
-                                for (int i = 1; i < generation.length; i++) {
-                                    generation[i] = baseNetwork.copy(MUTATION_RATE);
+                                if (cmd.hasOption('b')) {
+                                    Network baseNetwork = Network.parse(cmd.getOptionValue('b'));
+                                    generation[0] = baseNetwork.clone();
+                                    for (int i = 1; i < generation.length; i++) {
+                                        generation[i] = baseNetwork.copy(MUTATION_RATE);
+                                    }
+                                } else {
+                                    for (int i = 0; i < generation.length; i++) {
+                                        generation[i] = new Network(inputCount, outputCount);
+                                    }
                                 }
-                            } else {
-                                for (int i = 0; i < generation.length; i++) {
-                                    generation[i] = new Network(inputCount, outputCount);
-                                }
-                            }
 
-                            while (g < MAX_GENERATION_COUNT) {
-                                double[] fitnesses = new double[generation.length];
+                                while (g < MAX_GENERATION_COUNT) {
+                                    double[] fitnesses = new double[generation.length];
 
-                                ArrayList<Callable<Double>> tasks = new ArrayList<>();
-                                for (Network network : generation) {
-                                    int finalSeed = seed;
+                                    ArrayList<Callable<Double>> tasks = new ArrayList<>();
+                                    for (Network network : generation) {
+                                        int finalSeed = seed;
 //                                        tasks.add(() -> PROBLEM.test(network, false, /*1,*/ finalSeed));
-                                    tasks.add(() -> PROBLEM.test(network, finalSeed));
-//                                    tasks.add(() -> PROBLEM.test(network));
-                                }
-                                List<Future<Double>> invokeAll = exec.invokeAll(tasks);
-                                for (int i = 0; i < invokeAll.size(); i++) {
-                                    fitnesses[i] = invokeAll.get(i).get();
-                                }
+//                                    tasks.add(() -> PROBLEM.test(network, finalSeed));
+                                        tasks.add(() -> PROBLEM.test(network));
+                                    }
+                                    List<Future<Double>> invokeAll = exec.invokeAll(tasks);
+                                    for (int i = 0; i < invokeAll.size(); i++) {
+                                        fitnesses[i] = invokeAll.get(i).get();
+                                    }
 //                                    for (int i = 0; i < generation.length; i++) {
 //                                        Network network = generation[i];
 ////                                    fitnesses[i] = PROBLEM.test(network, false, seed);
@@ -209,67 +215,67 @@ public class Main {
 //                                        fitnesses[i] = PROBLEM.test(network);
 //                                    }
 
-                                Integer[] order = new Integer[generation.length];
-                                for (int i = 0; i < generation.length; i++) order[i] = i;
+                                    Integer[] order = new Integer[generation.length];
+                                    for (int i = 0; i < generation.length; i++) order[i] = i;
 
-                                Network[] finalGeneration = generation;
-                                Comparator<Integer> c;
-                                switch (SORT_METHOD) {
-                                    case LOG_SORT:
-                                        c = Comparator
-                                                .comparingDouble((Integer a) -> fitnesses[a] * Math.log(finalGeneration[a].getSynapseCount()))
-                                                .reversed();
-                                        break;
-                                    case TIE_MIN_NEURONS_SORT:
-                                        c = Comparator
-                                                .comparingDouble((Integer a) -> fitnesses[a])
-                                                .reversed()
-                                                .thenComparingInt(a -> finalGeneration[a].getSynapseCount());
-                                        break;
-                                    case FITNESS:
-                                    default:
-                                        c = Comparator
-                                                .comparingDouble((Integer a) -> fitnesses[a])
-                                                .reversed();
+                                    Network[] finalGeneration = generation;
+                                    Comparator<Integer> c;
+                                    switch (SORT_METHOD) {
+                                        case LOG_SORT:
+                                            c = Comparator
+                                                    .comparingDouble((Integer a) -> fitnesses[a] * Math.log(finalGeneration[a].getSynapseCount()))
+                                                    .reversed();
+                                            break;
+                                        case TIE_MIN_NEURONS_SORT:
+                                            c = Comparator
+                                                    .comparingDouble((Integer a) -> fitnesses[a])
+                                                    .reversed()
+                                                    .thenComparingInt(a -> finalGeneration[a].getSynapseCount());
+                                            break;
+                                        case FITNESS:
+                                        default:
+                                            c = Comparator
+                                                    .comparingDouble((Integer a) -> fitnesses[a])
+                                                    .reversed();
 
-                                }
+                                    }
 
-                                Arrays.sort(order, c);
+                                    Arrays.sort(order, c);
 
-                                int fittestIndex = order[0];
-                                double maxFitness = fitnesses[fittestIndex];
-                                fittestNetwork = generation[fittestIndex];
-                                int networkSize = fittestNetwork.getNeurons().size();
-                                String networkString = fittestNetwork.serialise();
+                                    int fittestIndex = order[0];
+                                    double maxFitness = fitnesses[fittestIndex];
+                                    fittestNetwork = generation[fittestIndex];
+                                    int networkSize = fittestNetwork.getNeurons().size();
+                                    String networkString = fittestNetwork.serialise();
 //                                    System.out.println(g + ": BEST FITNESS = " + maxFitness + "\t\thidden layer size = " + fittestNetwork.getHiddenLayerSize() + "\t\t" + networkString);
-                                if (!FINISHED && maxFitness >= THRESHOLD_FITNESS_FINISHED) {
-                                    RUN_GENERATIONS_TAKEN = g;
-                                    TIME_TAKEN = System.currentTimeMillis() - GENERATION_START;
+                                    if (!FINISHED && maxFitness >= THRESHOLD_FITNESS_FINISHED) {
+                                        RUN_GENERATIONS_TAKEN = g;
+                                        TIME_TAKEN = System.currentTimeMillis() - GENERATION_START;
 //                                    System.out.println("TIME_TAKEN = " + TIME_TAKEN);
-                                    FINISHED = true;
-                                    if (STOP_WHEN_FINISHED) break;
-                                }
-                                fileWriter.println(maxFitness + "," + networkSize + "," + networkString);
+                                        FINISHED = true;
+                                        if (STOP_WHEN_FINISHED) break;
+                                    }
+                                    fileWriter.println(maxFitness + "," + networkSize + "," + networkString);
 
-                                final Network[] nextGen = new Network[generation.length];
-                                if (CLONE_PARENTS) {
-                                    for (int i = 0; i < PARENT_COUNT; i++)
-                                        nextGen[i] = generation[order[i]].clone();
-                                } else {
-                                    for (int i = 0; i < PARENT_COUNT; i++)
-                                        nextGen[i] = generation[order[i]].copy(MUTATION_RATE);
-                                }
-                                for (int i = PARENT_COUNT; i < generation.length; i++) {
-                                    if (ASEXUAL_REPRODUCTION) {
-                                        nextGen[i] = generation[order[i]].copy(MUTATION_RATE);
+                                    final Network[] nextGen = new Network[generation.length];
+                                    if (CLONE_PARENTS) {
+                                        for (int i = 0; i < PARENT_COUNT; i++)
+                                            nextGen[i] = generation[order[i]].clone();
                                     } else {
-                                        int randomIndexA = Utils.logRandom(generation);
-                                        int randomIndexB = Utils.logRandom(generation);
-                                        Network a = generation[randomIndexA];
-                                        Network b = generation[randomIndexB];
-                                        Network crossover;
+                                        for (int i = 0; i < PARENT_COUNT; i++)
+                                            nextGen[i] = generation[order[i]].copy(MUTATION_RATE);
+                                    }
+                                    for (int i = PARENT_COUNT; i < generation.length; i++) {
+                                        if (ASEXUAL_REPRODUCTION) {
+                                            nextGen[i] = generation[order[i]].copy(MUTATION_RATE);
+                                        } else {
+                                            int randomIndexA = Utils.logRandom(generation);
+                                            int randomIndexB = Utils.logRandom(generation);
+                                            Network a = generation[randomIndexA];
+                                            Network b = generation[randomIndexB];
+                                            Network crossover;
 //                            try {
-                                        crossover = Network.crossover(a, b, fitnesses[randomIndexA], fitnesses[randomIndexB]);
+                                            crossover = Network.crossover(a, b, fitnesses[randomIndexA], fitnesses[randomIndexB]);
 //                            } catch (StackOverflowError e) {
 //                                System.out.println("ERROR CROSSING OVER: " + a.serialise() + " AND " + b.serialise());
 //                                crossover = random.nextBoolean() ? a : b;
@@ -277,50 +283,64 @@ public class Main {
 //                                DebugUtils.showGraph(b);
 //                                throw e;
 //                            }
-                                        if (COPY_CROSSOVERS) crossover = crossover.copy(MUTATION_RATE);
-                                        nextGen[i] = crossover;
+                                            if (COPY_CROSSOVERS) crossover = crossover.copy(MUTATION_RATE);
+                                            nextGen[i] = crossover;
+                                        }
                                     }
+                                    generation = nextGen;
+                                    seed = random.nextPositiveInt();
+                                    //            SwingUtilities.invokeLater(() -> showGraph(nextGen[0]));
+                                    //            plotChart(chartPanel, fittestNetwork, GOAL_FUNC);
+                                    //            jFrame.pack();
+                                    //            jFrame.setVisible(true);
+                                    g++;
                                 }
-                                generation = nextGen;
-                                seed = random.nextPositiveInt();
-                                //            SwingUtilities.invokeLater(() -> showGraph(nextGen[0]));
-                                //            plotChart(chartPanel, fittestNetwork, GOAL_FUNC);
-                                //            jFrame.pack();
-                                //            jFrame.setVisible(true);
-                                g++;
-                            }
 //                                if (STOP_WHEN_FINISHED) TOTAL_GENERATIONS_TAKEN += g;
-                            //                            long TRAINING_TIME = System.currentTimeMillis() - TRAINING_START;
+                                //                            long TRAINING_TIME = System.currentTimeMillis() - TRAINING_START;
 //                            System.out.println("FINISHED = " + GENERATIONS_THAT_FINISHED / TRIALS * 100 + "%");
 //                            System.out.println("AVERAGE TRAINING TIME = " + TRAINING_TIME / TRIALS + "ms");
-                            if (FINISHED) {
-                                RUN_SYNAPSE_COUNTS[RUN_I] = fittestNetwork.getSynapseCount();
-                                RUN_GENERATIONS_TAKENS[RUN_I] = RUN_GENERATIONS_TAKEN;
-                                RUN_TIME_TAKENS[RUN_I] = TIME_TAKEN;
+                                if (FINISHED) {
+                                    RUN_SYNAPSE_COUNTS[RUN_I] = fittestNetwork.getSynapseCount();
+                                    RUN_GENERATIONS_TAKENS[RUN_I] = RUN_GENERATIONS_TAKEN;
+                                    RUN_HIDDEN_NODE_COUNTS[RUN_I] = fittestNetwork.getHiddenLayerSize();
+                                    RUN_TIME_TAKENS[RUN_I] = TIME_TAKEN;
 //                            System.out.println("GENERATIONS_TAKEN = " + RUN_GENERATIONS_TAKENS[RUN_I]);
 //                            System.out.println("TIME_TAKEN = " + TIME_TAKEN + "ms");
 //                            System.out.println("RUN_SYNAPSE_COUNT = " + RUN_SYNAPSE_COUNTS[RUN_I]);
-                            }
+                                }
 //                            else {
 //                                System.out.println("RAN OUT OF GENERATIONS TO FIND SOLUTION");
 //                            }
-                            RUN_FINISHES[RUN_I] = FINISHED ? 1 : 0;
-                        }
-                        double avgGensTaken = Arrays.stream(RUN_GENERATIONS_TAKENS).average().getAsDouble();
+                                RUN_FINISHES[RUN_I] = FINISHED ? 1 : 0;
+                            }
 //                        System.out.println("___________________________________________________");
-                        System.out.println(" GENERATIONS TAKENS = " + Arrays.toString(RUN_GENERATIONS_TAKENS));
-                        System.out.println("FINISH RATE = " + Arrays.stream(RUN_FINISHES).average().getAsDouble() * 100 + "%");
-                        System.out.println("AVERAGE GENERATIONS TAKEN = " + avgGensTaken);
-                        System.out.println("AVERAGE SYNAPSE COUNTS = " + Arrays.stream(RUN_SYNAPSE_COUNTS).average().getAsDouble());
+                            System.out.println(" - GENERATIONS TAKENS = " + Arrays.toString(RUN_GENERATIONS_TAKENS));
+                            System.out.println(" - SYNAPSE COUNT = " + Arrays.toString(RUN_SYNAPSE_COUNTS));
+                            System.out.println(" - HIDDEN NODE COUNTS = " + Arrays.toString(RUN_HIDDEN_NODE_COUNTS));
+                            System.out.println("FINISH RATE = " + Arrays.stream(RUN_FINISHES).average().getAsDouble() * 100 + "%");
+                            System.out.println("AVERAGE SYNAPSE COUNTS = " + Arrays.stream(RUN_SYNAPSE_COUNTS).average().getAsDouble());
 
-                        System.out.println("AVERAGE TIME TAKEN = " + Arrays.stream(RUN_TIME_TAKENS).average().getAsDouble());
+                            System.out.println("AVERAGE TIME TAKEN = " + Arrays.stream(RUN_TIME_TAKENS).average().getAsDouble());
+                            {
+                                double avgGensTaken = Arrays.stream(RUN_GENERATIONS_TAKENS).average().getAsDouble();
+                                System.out.println("AVERAGE GENERATIONS TAKEN = " + avgGensTaken);
+                                double STDEV = 0;
+                                for (long taken : RUN_GENERATIONS_TAKENS) {
+                                    STDEV += Math.pow(taken - avgGensTaken, 2);
+                                }
+                                STDEV = Math.sqrt(STDEV / RUNS_ALLOWED);
+                                System.out.println("STDEV OF GENERATIONS TAKEN: " + STDEV);
+                            }
 
-                        double STDEV = 0;
-                        for (long taken : RUN_GENERATIONS_TAKENS) {
-                            STDEV += Math.pow(taken - avgGensTaken, 2);
+                            double avghiddennodes = Arrays.stream(RUN_HIDDEN_NODE_COUNTS).average().getAsDouble();
+                            System.out.println("AVERAGE HIDDEN NODES = " + avghiddennodes);
+                            double hiddenSTDEV = 0;
+                            for (long taken : RUN_HIDDEN_NODE_COUNTS) {
+                                hiddenSTDEV += Math.pow(taken - avghiddennodes, 2);
+                            }
+                            hiddenSTDEV = Math.sqrt(hiddenSTDEV / RUNS_ALLOWED);
+                            System.out.println("STDEV OF HIDDEN NODES USED: " + hiddenSTDEV + "\n\n\n");
                         }
-                        STDEV = Math.sqrt(STDEV / RUNS_ALLOWED);
-                        System.out.println("STDEV OF TAKENS: " + STDEV + "\n\n\n");
                     }
                 }
             }
