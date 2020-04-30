@@ -298,9 +298,10 @@ public class Main {
 //                            System.out.println("GENERATIONS_TAKEN = " + RUN_GENERATIONS_TAKENS[RUN_I]);
 //                            System.out.println("TIME_TAKEN = " + TIME_TAKEN + "ms");
 //                            System.out.println("RUN_SYNAPSE_COUNT = " + RUN_SYNAPSE_COUNTS[RUN_I]);
-                            } else {
-                                System.out.println("RAN OUT OF GENERATIONS TO FIND SOLUTION");
                             }
+//                            else {
+//                                System.out.println("RAN OUT OF GENERATIONS TO FIND SOLUTION");
+//                            }
                             RUN_FINISHES[RUN_I] = FINISHED ? 1 : 0;
                         }
                         double avgGensTaken = Arrays.stream(RUN_GENERATIONS_TAKENS).average().getAsDouble();
