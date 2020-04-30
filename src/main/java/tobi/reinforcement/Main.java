@@ -113,25 +113,25 @@ public class Main {
 //        jFrame.setContentPane(chartPanel);
 
             int TRIALS = 10;
-            int SKIP_COUNTER = 0;
-            int SKIPS = 0;
+//            int SKIP_COUNTER = 0;
+//            int SKIPS = 0;
             for (int GENERATION_SIZE_I = 0; GENERATION_SIZE_I < 7; GENERATION_SIZE_I++) {
                 int GENERATION_SIZE = (int) (100 * Math.pow(2, GENERATION_SIZE_I));
 //            {
 //                int GENERATION_SIZE = 100;
                 ExecutorService exec = Executors.newFixedThreadPool(GENERATION_SIZE);
                 final int PARENT_COUNT = (int) Math.ceil(GENERATION_SIZE * PARENT_RATIO);
-//                for (int MURATION_RATE_I = 0; MURATION_RATE_I < 5; MURATION_RATE_I++) {
-//                    double MUTATION_RATE = 0.01 * Math.pow(2, MURATION_RATE_I);
-                {
-                    double MUTATION_RATE = 0.32;
+                for (int MURATION_RATE_I = 0; MURATION_RATE_I < 5; MURATION_RATE_I++) {
+                    double MUTATION_RATE = 0.01 * Math.pow(2, MURATION_RATE_I);
+//                {
+//                    double MUTATION_RATE = 0.32;
                     for (SortMethod SORT_METHOD : SortMethod.values()) {
 //                    {
 //                        SortMethod SORT_METHOD = SortMethod.LOG_SORT;
-                        if (SKIPS < SKIP_COUNTER) {
-                            SKIPS++;
-                            continue;
-                        }
+//                        if (SKIPS < SKIP_COUNTER) {
+//                            SKIPS++;
+//                            continue;
+//                        }
                         MyRandom random = new MyRandom(0);
 
 
@@ -227,7 +227,7 @@ public class Main {
                                     int networkSize = fittestNetwork.getNeurons().size();
                                     String networkString = fittestNetwork.serialise();
 //                                System.out.println(g + ": BEST FITNESS = " + maxFitness + "\t\thidden layer size = " + fittestNetwork.getHiddenLayerSize() + "\t\t" + networkString);
-                                    if (maxFitness == 500D) {
+                                    if (maxFitness == 4D) {
                                         FINISHED++;
                                         break;
                                     }
