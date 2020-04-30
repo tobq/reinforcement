@@ -91,9 +91,9 @@ public class Main {
         System.out.println(Arrays.toString((args)));
 
 //        final String ENV_ID = "BipedalWalker-v3";
-        final String ENV_ID = "CartPole-v1";
 //        final String ENV_ID = "LunarLanderContinuous-v2";
 //        try (BoxBoxGym PROBLEM = cmd.hasOption(INTERPRETER_ARG_KEY) ? new BoxBoxGym(ENV_ID, cmd.getOptionValue(INTERPRETER_ARG_KEY)) : new BoxBoxGym(ENV_ID)) {
+        final String ENV_ID = "CartPole-v1";
         try (BoxDiscreteGym PROBLEM = cmd.hasOption(INTERPRETER_ARG_KEY) ? new BoxDiscreteGym(ENV_ID, cmd.getOptionValue(INTERPRETER_ARG_KEY)) : new BoxDiscreteGym(ENV_ID)) {
 //        XORProblem PROBLEM = new XORProblem();
 //        {
@@ -113,7 +113,7 @@ public class Main {
 //        jFrame.setContentPane(chartPanel);
 
             int TRIALS = 10;
-            int SKIP_COUNTER = 0;
+            int SKIP_COUNTER = 15;
             int SKIPS = 0;
             for (int GENERATION_SIZE_I = 0; GENERATION_SIZE_I < 7; GENERATION_SIZE_I++) {
                 int GENERATION_SIZE = (int) (100 * Math.pow(2, GENERATION_SIZE_I));
@@ -179,9 +179,9 @@ public class Main {
                                     ArrayList<Callable<Double>> tasks = new ArrayList<>();
                                     for (Network network : generation) {
                                         int finalSeed = seed;
-                                        tasks.add(() -> PROBLEM.test(network, false, /*1,*/ finalSeed));
+//                                        tasks.add(() -> PROBLEM.test(network, false, /*1,*/ finalSeed));
 //                                    tasks.add(() -> PROBLEM.test(network, finalSeed));
-//                        tasks.add(() -> PROBLEM.test(network));
+                        tasks.add(() -> PROBLEM.test(network));
                                     }
                                     List<Future<Double>> invokeAll = exec.invokeAll(tasks);
                                     for (int i = 0; i < invokeAll.size(); i++) {

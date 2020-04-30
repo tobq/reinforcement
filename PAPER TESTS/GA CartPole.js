@@ -87,7 +87,23 @@ TIE_MIN_NEURONS_SORT,           3200,           0.08,           1,              
 FITNESS,                3200,           0.08,           1,              5158
 LOG_SORT,               3200,           0.16,           1,              5854
 TIE_MIN_NEURONS_SORT,           3200,           0.16,           1,              5766
-FITNESS,                3200,           0.16,           1,              4838`
+FITNESS,                3200,           0.16,           1,              4838
+LOG_SORT,               100,            0.32,           1,              2036
+TIE_MIN_NEURONS_SORT,           100,            0.32,           1,              747
+FITNESS,                100,            0.32,           1,              1054
+LOG_SORT,               200,            0.32,           1,              1521
+TIE_MIN_NEURONS_SORT,           200,            0.32,           1,              1308
+FITNESS,                200,            0.32,           1,              1192
+LOG_SORT,               400,            0.32,           1,              1073
+TIE_MIN_NEURONS_SORT,           400,            0.32,           1,              3168
+FITNESS,                400,            0.32,           1,              1205
+LOG_SORT,               800,            0.32,           1,              1913
+TIE_MIN_NEURONS_SORT,           800,            0.32,           1,              1728
+FITNESS,                800,            0.32,           1,              2026
+LOG_SORT,               1600,           0.32,           1,              3071
+TIE_MIN_NEURONS_SORT,           1600,           0.32,           1,              2618
+FITNESS,                1600,           0.32,           1,              3384
+`
     .split("\n")
     .map(string => {
         let row = string.split(",").map(x => x.trim());
