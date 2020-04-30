@@ -21,7 +21,7 @@ public class Main {
 //    public static final double MUTATION_RATE = 0.1;
 //    public static final int GENERATION_SIZE = 250;
 //    private static final SortMethod SORT_METHOD = SortMethod.TIE_MIN_NEURONS_SORT;
-    public static final long MAX_GENERATION_COUNT = 500;
+    public static final long MAX_GENERATION_COUNT = 10000;
     //        public static final int GENERATION_SIZE = 10000;
 //    private static final double PARENT_RATIO = 1;
     private static final double PARENT_RATIO = 0.1;
