@@ -143,7 +143,7 @@ public class Main {
                         long TRAINING_START = System.currentTimeMillis();
                         try (PrintWriter fileWriter = new PrintWriter(new FileWriter(TRAINING_START + ".csv"))) {
                             for (String setting : CONFIG) {
-                                System.out.println(setting);
+//                                System.out.println(setting);
                                 fileWriter.println("#" + setting);
                             }
 
