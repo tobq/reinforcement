@@ -91,11 +91,12 @@ public class Main {
         System.out.println(Arrays.toString((args)));
 
 //        final String ENV_ID = "BipedalWalker-v3";
+        final String ENV_ID = "CartPole-v1";
 //        final String ENV_ID = "LunarLanderContinuous-v2";
 //        try (BoxBoxGym PROBLEM = cmd.hasOption(INTERPRETER_ARG_KEY) ? new BoxBoxGym(ENV_ID, cmd.getOptionValue(INTERPRETER_ARG_KEY)) : new BoxBoxGym(ENV_ID)) {
+        try (BoxDiscreteGym PROBLEM = cmd.hasOption(INTERPRETER_ARG_KEY) ? new BoxDiscreteGym(ENV_ID, cmd.getOptionValue(INTERPRETER_ARG_KEY)) : new BoxDiscreteGym(ENV_ID)) {
 //        XORProblem PROBLEM = new XORProblem();
 //        {
-        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("CartPole-v1")) {
 //        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("Pong-ram-v0")) {
 //        try (BoxBoxGym PROBLEM = new BoxBoxGym("LunarLanderContinuous-v2")) {
 //        try (DiscreteBoxGym PROBLEM = new DiscreteBoxGym("HotterColder-v0")) {

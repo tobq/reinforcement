@@ -14,6 +14,10 @@ public class BoxDiscreteGym extends Gym<Box, Discrete> {
         super(envId);
     }
 
+    public BoxDiscreteGym(String envId, String pythonExecutable) throws InterruptedException, IOException, URISyntaxException {
+        super(envId, pythonExecutable);
+    }
+
     @Override
     protected int getLabelLength(Environment<Box, Discrete> env) {
         return ((BoxDiscreteEnvironment) env).getActionSpace().getSize();
