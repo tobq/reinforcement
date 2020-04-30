@@ -80,10 +80,17 @@ LOG_SORT,3200,0.02,1,4531
 TIE_MIN_NEURONS_SORT,3200,0.02,1,7094
 FITNESS,3200,0.02,1,4962
 LOG_SORT,3200,0.04,1,6436
-TIE_MIN_NEURONS_SORT,3200,0.04,1,5118`
+TIE_MIN_NEURONS_SORT,3200,0.04,1,5118
+FITNESS,                3200,           0.04,           1,              6596
+LOG_SORT,               3200,           0.08,           1,              8711
+TIE_MIN_NEURONS_SORT,           3200,           0.08,           1,              5668
+FITNESS,                3200,           0.08,           1,              5158
+LOG_SORT,               3200,           0.16,           1,              5854
+TIE_MIN_NEURONS_SORT,           3200,           0.16,           1,              5766
+FITNESS,                3200,           0.16,           1,              4838`
     .split("\n")
     .map(string => {
-        let row = string.split(",");
+        let row = string.split(",").map(x => x.trim());
         return row[4]
         // row[0] = row[0].replace(/_/g, " ");
         // row[4] /= 1000;
