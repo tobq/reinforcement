@@ -76,6 +76,7 @@ public class Main {
         options.addOption(INTERPRETER_ARG_KEY, "interpreter", true, "Python interpreter (executable) to be used.");
 
         options.addOption("b", "base-network", true, "Based network used to generate initial population");
+        options.addOption("s", "skip", true, "Amount of tests to skip");
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -113,7 +114,7 @@ public class Main {
 //        jFrame.setContentPane(chartPanel);
 
             int TRIALS = 10;
-            int SKIP_COUNTER = 45;
+            int SKIP_COUNTER = Integer.parseInt(cmd.getOptionValue("s"));
             int SKIPS = 0;
             for (int GENERATION_SIZE_I = 0; GENERATION_SIZE_I < 7; GENERATION_SIZE_I++) {
                 int GENERATION_SIZE = (int) (100 * Math.pow(2, GENERATION_SIZE_I));
