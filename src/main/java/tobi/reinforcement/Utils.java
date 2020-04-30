@@ -32,7 +32,6 @@ public class Utils {
 
                 new T1(),
                 new Variable() // TODO: >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> UNCOMMENT RNN
-
         };
     }
 

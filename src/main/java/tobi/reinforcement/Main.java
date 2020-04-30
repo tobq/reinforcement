@@ -2,6 +2,7 @@ package tobi.reinforcement;
 
 import org.apache.commons.cli.*;
 import tobi.reinforcement.network.Network;
+import tobi.reinforcement.problems.Memorise;
 import tobi.reinforcement.problems.XORProblem;
 
 import java.io.*;
@@ -29,7 +30,7 @@ public class Main {
     private static final boolean CLONE_PARENTS = true;
 
     private static final boolean STOP_WHEN_FINISHED = true;
-    private static final double THRESHOLD_FITNESS_FINISHED = 3.9;
+    private static final double THRESHOLD_FITNESS_FINISHED = 0;
 
     /**
      * Started with forward-fed network
@@ -94,7 +95,8 @@ public class Main {
 //        try (BoxBoxGym PROBLEM = cmd.hasOption(INTERPRETER_ARG_KEY) ? new BoxBoxGym(ENV_ID, cmd.getOptionValue(INTERPRETER_ARG_KEY)) : new BoxBoxGym(ENV_ID)) {
 //        final String ENV_ID = "CartPole-v1";
 //        try (BoxDiscreteGym PROBLEM = cmd.hasOption(INTERPRETER_ARG_KEY) ? new BoxDiscreteGym(ENV_ID, cmd.getOptionValue(INTERPRETER_ARG_KEY)) : new BoxDiscreteGym(ENV_ID)) {
-        XORProblem PROBLEM = new XORProblem();
+//        XORProblem PROBLEM = new XORProblem();
+        Memorise PROBLEM = new Memorise(5);
 //        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("Pong-ram-v0")) {
 //        try (BoxBoxGym PROBLEM = new BoxBoxGym("LunarLanderContinuous-v2")) {
 //        try (DiscreteBoxGym PROBLEM = new DiscreteBoxGym("HotterColder-v0")) {
@@ -110,7 +112,6 @@ public class Main {
 //        JFrame jFrame = new JFrame();
 //        jFrame.setContentPane(chartPanel);
 
-//            int TRIALS = 1;
 //            int SKIP_COUNTER = 0;
 //            int SKIPS = 0;
 //        for (int GENERATION_SIZE_I = 0; GENERATION_SIZE_I < 7; GENERATION_SIZE_I++) {
@@ -124,8 +125,8 @@ public class Main {
 //            {
 //                double MUTATION_RATE = 0.15;
                 for (SortMethod SORT_METHOD : SortMethod.values()) {
-//                    {
-//                    SortMethod SORT_METHOD = SortMethod.FITNESS;
+//                {
+//                    SortMethod SORT_METHOD = SortMethod.TIE_MIN_NEURONS_SORT;
 //                        if (SKIPS < SKIP_COUNTER) {
 //                            SKIPS++;
 //                            continue;
@@ -143,9 +144,10 @@ public class Main {
                             "CLONE_PARENTS = " + CLONE_PARENTS,
                             "SORT_METHOD = " + SORT_METHOD
                     };
+                    System.out.println("Sort:" + SORT_METHOD + "\tSize:" + GENERATION_SIZE + "\tMut:" + MUTATION_RATE);
                     try (PrintWriter fileWriter = new PrintWriter(new FileWriter(System.currentTimeMillis() + ".csv"))) {
                         for (String setting : CONFIG) {
-                            System.out.println(setting);
+//                            System.out.println(setting);
                             fileWriter.println("#" + setting);
                         }
 
@@ -155,7 +157,7 @@ public class Main {
 
                         MyRandom random = new MyRandom(0);
                         int seed = random.nextPositiveInt();
-                        int RUNS_ALLOWED = 100;
+                        int RUNS_ALLOWED = 10;
                         long[] RUN_GENERATIONS_TAKENS = new long[RUNS_ALLOWED];
                         long[] RUN_TIME_TAKENS = new long[RUNS_ALLOWED];
                         int[] RUN_SYNAPSE_COUNTS = new int[RUNS_ALLOWED];
@@ -193,8 +195,8 @@ public class Main {
                                 for (Network network : generation) {
                                     int finalSeed = seed;
 //                                        tasks.add(() -> PROBLEM.test(network, false, /*1,*/ finalSeed));
-//                                    tasks.add(() -> PROBLEM.test(network, finalSeed));
-                                    tasks.add(() -> PROBLEM.test(network));
+                                    tasks.add(() -> PROBLEM.test(network, finalSeed));
+//                                    tasks.add(() -> PROBLEM.test(network));
                                 }
                                 List<Future<Double>> invokeAll = exec.invokeAll(tasks);
                                 for (int i = 0; i < invokeAll.size(); i++) {
