@@ -20,7 +20,7 @@ public class Main {
 //    public static final double MUTATION_RATE = 0.1;
 //    public static final int GENERATION_SIZE = 250;
 //    private static final SortMethod SORT_METHOD = SortMethod.TIE_MIN_NEURONS_SORT;
-    public static final long MAX_GENERATION_COUNT = 5000;
+    public static final long MAX_GENERATION_COUNT = 500;
     //        public static final int GENERATION_SIZE = 10000;
 //    private static final double PARENT_RATIO = 1;
     private static final double PARENT_RATIO = 0.1;
@@ -306,11 +306,11 @@ public class Main {
                         double avgGensTaken = Arrays.stream(RUN_GENERATIONS_TAKENS).average().getAsDouble();
 //                        System.out.println("___________________________________________________");
                         System.out.println(" GENERATIONS TAKENS = " + Arrays.toString(RUN_GENERATIONS_TAKENS));
-                        System.out.println("FINISH RATE = " + Arrays.stream(RUN_TIME_TAKENS).average().getAsDouble() * 100 + "%");
+                        System.out.println("FINISH RATE = " + Arrays.stream(RUN_FINISHES).average().getAsDouble() * 100 + "%");
                         System.out.println("AVERAGE GENERATIONS TAKEN = " + avgGensTaken);
-                        System.out.println("AVERAGE TIME TAKEN = " + Arrays.stream(RUN_TIME_TAKENS).average().getAsDouble());
                         System.out.println("AVERAGE SYNAPSE COUNTS = " + Arrays.stream(RUN_SYNAPSE_COUNTS).average().getAsDouble());
 
+                        System.out.println("AVERAGE TIME TAKEN = " + Arrays.stream(RUN_TIME_TAKENS).average().getAsDouble());
 
                         double STDEV = 0;
                         for (long taken : RUN_GENERATIONS_TAKENS) {
