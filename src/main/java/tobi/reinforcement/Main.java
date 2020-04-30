@@ -176,23 +176,23 @@ public class Main {
                                 for (int g = 0; g < MAX_GENERATION_COUNT; g++) {
                                     double[] fitnesses = new double[generation.length];
 
-//                                    ArrayList<Callable<Double>> tasks = new ArrayList<>();
-//                                    for (Network network : generation) {
-//                                        int finalSeed = seed;
-//                                        tasks.add(() -> PROBLEM.test(network, false, /*1,*/ finalSeed));
-////                                    tasks.add(() -> PROBLEM.test(network, finalSeed));
-////                        tasks.add(() -> PROBLEM.test(network));
-//                                    }
-//                                    List<Future<Double>> invokeAll = exec.invokeAll(tasks);
-//                                    for (int i = 0; i < invokeAll.size(); i++) {
-//                                        fitnesses[i] = invokeAll.get(i).get();
-//                                    }
-                                for (int i = 0; i < generation.length; i++) {
-                                    Network network = generation[i];
-                                    fitnesses[i] = PROBLEM.test(network, false, seed);
-//                        fitnesses[i] = PROBLEM.test(network, seed);
-//                        fitnesses[i] = PROBLEM.test(network);
-                                }
+                                    ArrayList<Callable<Double>> tasks = new ArrayList<>();
+                                    for (Network network : generation) {
+                                        int finalSeed = seed;
+                                        tasks.add(() -> PROBLEM.test(network, false, /*1,*/ finalSeed));
+//                                    tasks.add(() -> PROBLEM.test(network, finalSeed));
+//                        tasks.add(() -> PROBLEM.test(network));
+                                    }
+                                    List<Future<Double>> invokeAll = exec.invokeAll(tasks);
+                                    for (int i = 0; i < invokeAll.size(); i++) {
+                                        fitnesses[i] = invokeAll.get(i).get();
+                                    }
+//                                for (int i = 0; i < generation.length; i++) {
+//                                    Network network = generation[i];
+//                                    fitnesses[i] = PROBLEM.test(network, false, seed);
+////                        fitnesses[i] = PROBLEM.test(network, seed);
+////                        fitnesses[i] = PROBLEM.test(network);
+//                                }
 
                                     Integer[] order = new Integer[generation.length];
                                     for (int i = 0; i < generation.length; i++) order[i] = i;
