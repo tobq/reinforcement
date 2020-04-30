@@ -76,7 +76,6 @@ public class Main {
         options.addOption(INTERPRETER_ARG_KEY, "interpreter", true, "Python interpreter (executable) to be used.");
 
         options.addOption("b", "base-network", true, "Based network used to generate initial population");
-        options.addOption("s", "skip", true, "Amount of tests to skip");
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -114,10 +113,11 @@ public class Main {
 //        jFrame.setContentPane(chartPanel);
 
             int TRIALS = 10;
-            int SKIP_COUNTER = Integer.parseInt(cmd.getOptionValue("s"));
+            int SKIP_COUNTER = 58;
             int SKIPS = 0;
             for (int GENERATION_SIZE_I = 0; GENERATION_SIZE_I < 7; GENERATION_SIZE_I++) {
                 int GENERATION_SIZE = (int) (100 * Math.pow(2, GENERATION_SIZE_I));
+                ExecutorService exec = Executors.newFixedThreadPool(GENERATION_SIZE);
                 final int PARENT_COUNT = (int) Math.ceil(GENERATION_SIZE * PARENT_RATIO);
                 for (int MURATION_RATE_I = 0; MURATION_RATE_I < 5; MURATION_RATE_I++) {
                     double MUTATION_RATE = 0.01 * Math.pow(2, MURATION_RATE_I);
@@ -143,7 +143,7 @@ public class Main {
                         long TRAINING_START = System.currentTimeMillis();
                         try (PrintWriter fileWriter = new PrintWriter(new FileWriter(TRAINING_START + ".csv"))) {
                             for (String setting : CONFIG) {
-//                                System.out.println(setting);
+                                System.out.println(setting);
                                 fileWriter.println("#" + setting);
                             }
 
@@ -163,8 +163,6 @@ public class Main {
                                     generation[i] = new Network(inputCount, outputCount);
                                 }
                             }
-
-                            ExecutorService exec = Executors.newFixedThreadPool(GENERATION_SIZE);
                             int seed = random.nextPositiveInt();
 
                             int FINISHED = 0;
@@ -276,6 +274,7 @@ public class Main {
                 }
             }
         }
+        System.out.println("FINISHED");
     }
 
     private static class MyRandom extends Random {
