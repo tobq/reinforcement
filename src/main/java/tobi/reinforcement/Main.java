@@ -4,6 +4,7 @@ import org.apache.commons.cli.*;
 import tobi.reinforcement.network.Network;
 import tobi.reinforcement.problems.Memorise;
 import tobi.reinforcement.problems.XORProblem;
+import tobi.reinforcement.problems.gym.BoxDiscreteGym;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -11,6 +12,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class Main {
+    public static final double DEFAULT_MUTATION_RATE = 0.2;
     private static final String INTERPRETER_ARG_KEY = "i";
     //    private static final DoubleUnaryOperator GOAL_FUNC = x -> x * x - 50;
 //    private static final Approximate PROBLEM = new Approximate(GOAL_FUNC);
@@ -21,7 +23,7 @@ public class Main {
 //    public static final double MUTATION_RATE = 0.1;
 //    public static final int GENERATION_SIZE = 250;
 //    private static final SortMethod SORT_METHOD = SortMethod.TIE_MIN_NEURONS_SORT;
-    public static final long MAX_GENERATION_COUNT = 500;
+    public static final long MAX_GENERATION_COUNT = 5000;
     //        public static final int GENERATION_SIZE = 10000;
 //    private static final double PARENT_RATIO = 1;
     private static final double PARENT_RATIO = 0.1;
@@ -30,8 +32,10 @@ public class Main {
     private static final boolean CLONE_PARENTS = true;
 
     private static final boolean STOP_WHEN_FINISHED = true;
+    private static final double THRESHOLD_FITNESS_FINISHED = 0;
+    private static final boolean VARIABLE_ENVIRONMENT = false;
     //    private static final double THRESHOLD_FITNESS_FINISHED = 3.9;
-    private static final double THRESHOLD_FITNESS_FINISHED = -0.158114;
+//    private static final double THRESHOLD_FITNESS_FINISHED = -0.158114;
 
     /**
      * Started with forward-fed network
@@ -96,8 +100,8 @@ public class Main {
 //        try (BoxBoxGym PROBLEM = cmd.hasOption(INTERPRETER_ARG_KEY) ? new BoxBoxGym(ENV_ID, cmd.getOptionValue(INTERPRETER_ARG_KEY)) : new BoxBoxGym(ENV_ID)) {
 //        final String ENV_ID = "CartPole-v1";
 //        try (BoxDiscreteGym PROBLEM = cmd.hasOption(INTERPRETER_ARG_KEY) ? new BoxDiscreteGym(ENV_ID, cmd.getOptionValue(INTERPRETER_ARG_KEY)) : new BoxDiscreteGym(ENV_ID)) {
-        XORProblem PROBLEM = new XORProblem();
-//        Memorise PROBLEM = new Memorise(5);
+//        XORProblem PROBLEM = new XORProblem();
+        Memorise PROBLEM = new Memorise(4);
 //        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("Pong-ram-v0")) {
 //        try (BoxBoxGym PROBLEM = new BoxBoxGym("LunarLanderContinuous-v2")) {
 //        try (DiscreteBoxGym PROBLEM = new DiscreteBoxGym("HotterColder-v0")) {
@@ -115,20 +119,21 @@ public class Main {
 
 //            int SKIP_COUNTER = 0;
 //            int SKIPS = 0;
-        for (int GENERATION_SIZE_I = 0; GENERATION_SIZE_I < 7; GENERATION_SIZE_I++) {
-            int GENERATION_SIZE = (int) (100 * Math.pow(2, GENERATION_SIZE_I));
+//        for (int GENERATION_SIZE_I = 0; GENERATION_SIZE_I < 7; GENERATION_SIZE_I++)
+        {
+//            int GENERATION_SIZE = 150;
+            int GENERATION_SIZE = 15000;
+//            int GENERATION_SIZE = (int) (100 * Math.pow(2, GENERATION_SIZE_I));
 //        for (int PROGRAM_LOOPS = 0; PROGRAM_LOOPS < 1000; PROGRAM_LOOPS++)
-//        {
             {
-//                int GENERATION_SIZE = 150;
                 ExecutorService exec = Executors.newFixedThreadPool(GENERATION_SIZE);
                 final int PARENT_COUNT = (int) Math.ceil(GENERATION_SIZE * PARENT_RATIO);
 
 //            for (int MURATION_RATE_I = 0; MURATION_RATE_I < 5; MURATION_RATE_I++)
-                for (double MUTATION_RATE = 0.15; MUTATION_RATE < 0.3; MUTATION_RATE += 0.01) {
+//                for (double MUTATION_RATE = 0.15; MUTATION_RATE < 0.3; MUTATION_RATE += 0.01) {
 //                    double MUTATION_RATE = 0.01 * Math.pow(2, MURATION_RATE_I);
-//                {
-//                    double MUTATION_RATE = 0.25;
+                {
+                    double MUTATION_RATE = 0.2;
 //                for (SortMethod SORT_METHOD : SortMethod.values()) {
                     {
                         SortMethod SORT_METHOD = SortMethod.TIE_MIN_NEURONS_SORT;
@@ -201,8 +206,8 @@ public class Main {
                                     for (Network network : generation) {
                                         int finalSeed = seed;
 //                                        tasks.add(() -> PROBLEM.test(network, false, /*1,*/ finalSeed));
-//                                    tasks.add(() -> PROBLEM.test(network, finalSeed));
-                                        tasks.add(() -> PROBLEM.test(network));
+                                        tasks.add(() -> PROBLEM.test(network, finalSeed));
+//                                        tasks.add(() -> PROBLEM.test(network));
                                     }
                                     List<Future<Double>> invokeAll = exec.invokeAll(tasks);
                                     for (int i = 0; i < invokeAll.size(); i++) {
@@ -247,7 +252,7 @@ public class Main {
                                     fittestNetwork = generation[fittestIndex];
                                     int networkSize = fittestNetwork.getNeurons().size();
                                     String networkString = fittestNetwork.serialise();
-//                                    System.out.println(g + ": BEST FITNESS = " + maxFitness + "\t\thidden layer size = " + fittestNetwork.getHiddenLayerSize() + "\t\t" + networkString);
+                                    System.out.println(g + ": BEST FITNESS = " + maxFitness + "\t\thidden layer size = " + fittestNetwork.getHiddenLayerSize() + "\t\t" + networkString);
                                     if (!FINISHED && maxFitness >= THRESHOLD_FITNESS_FINISHED) {
                                         RUN_GENERATIONS_TAKEN = g;
                                         TIME_TAKEN = System.currentTimeMillis() - GENERATION_START;
@@ -288,11 +293,7 @@ public class Main {
                                         }
                                     }
                                     generation = nextGen;
-                                    seed = random.nextPositiveInt();
-                                    //            SwingUtilities.invokeLater(() -> showGraph(nextGen[0]));
-                                    //            plotChart(chartPanel, fittestNetwork, GOAL_FUNC);
-                                    //            jFrame.pack();
-                                    //            jFrame.setVisible(true);
+                                    if (VARIABLE_ENVIRONMENT) seed = random.nextPositiveInt();
                                     g++;
                                 }
 //                                if (STOP_WHEN_FINISHED) TOTAL_GENERATIONS_TAKEN += g;

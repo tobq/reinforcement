@@ -2,6 +2,7 @@ package tobi.reinforcement.network;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tobi.reinforcement.Main;
 import tobi.reinforcement.network.neuron.Neuron;
 
 import java.util.Set;
@@ -26,8 +27,8 @@ public class NetworkTest {
         }
 
         for (int i = 0; i < 10000; i++) {
-            generatedNetwork = generatedNetwork.copy();
-            generatedNetwork2 = generatedNetwork2.copy();
+            generatedNetwork = generatedNetwork.copy(Main.DEFAULT_MUTATION_RATE);
+            generatedNetwork2 = generatedNetwork2.copy(Main.DEFAULT_MUTATION_RATE);
         }
         System.out.println("Neurons in mutated network: " + generatedNetwork.getNeurons().size());
         System.out.println("Neurons in mutated network 2: " + generatedNetwork2.getNeurons().size());
@@ -43,7 +44,7 @@ public class NetworkTest {
 
     @Test
     public void benchmarkCopy() {
-        double avg = benchmark(() -> generatedNetwork.copy());
+        double avg = benchmark(() -> generatedNetwork.copy(Main.DEFAULT_MUTATION_RATE));
         System.out.println("Average copy time: " + avg + "ms");
     }
 
@@ -71,8 +72,8 @@ public class NetworkTest {
 
         for (int i = 0; i < 2000; i++)
             for (double[] input : RANDOM_INPUTS) {
-                clone = Network.crossover(clone, clone2, 1, 1).copy();
-                clone2 = Network.crossover(clone2, clone, 1, 1).copy();
+                clone = Network.crossover(clone, clone2, 1, 1).copy(Main.DEFAULT_MUTATION_RATE);
+                clone2 = Network.crossover(clone2, clone, 1, 1).copy(Main.DEFAULT_MUTATION_RATE);
 
                 clone.compute(input);
                 clone2.compute(input);
@@ -142,7 +143,7 @@ public class NetworkTest {
         Network net = BUILT_NETWORK;
 
         for (int i = 0; i < 10000; i++) {
-            net = net.copy();
+            net = net.copy(Main.DEFAULT_MUTATION_RATE);
 
             Set<Neuron> neurons = net.getNeurons();
             for (Neuron neuron : neurons) {
@@ -159,7 +160,7 @@ public class NetworkTest {
         Network net = BUILT_NETWORK;
 
         for (int i = 0; i < 10000; i++) {
-            net = net.copy();
+            net = net.copy(Main.DEFAULT_MUTATION_RATE);
 
             Set<Neuron> neurons = net.getNeurons();
             for (Neuron neuron : neurons) {

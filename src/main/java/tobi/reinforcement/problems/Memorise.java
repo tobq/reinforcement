@@ -14,10 +14,16 @@ public class Memorise {
     public double test(Network network, Integer seed) {
         Random random = new Random(seed);
         network.reset();
+
+//        double[] string = {1,2,3,4};
         double[] string = new double[digits];
+        double min = 0;
+        double max = 10;
         for (int i = 0; i < digits; i++) {
-            string[i] = random.nextDouble() * 10 - 5;
+//            string[i] = 13;
+            string[i] = random.nextDouble() * (min-max) - min;
         }
+
         int finalIndex = string.length - 1;
         for (int i = 0; i < finalIndex; i++) {
             network.compute(string[i]);
@@ -28,7 +34,7 @@ public class Memorise {
             error += Math.abs(remembered[i] - string[i]);
         }
         if (Double.isNaN(error)) return Double.NEGATIVE_INFINITY;
-        return -error / digits;
+        return -error;
     }
 
     public int getLabelLength() {
