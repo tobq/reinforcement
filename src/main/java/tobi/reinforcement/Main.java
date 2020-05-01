@@ -4,6 +4,7 @@ import org.apache.commons.cli.*;
 import tobi.reinforcement.network.Network;
 import tobi.reinforcement.problems.Memorise;
 import tobi.reinforcement.problems.XORProblem;
+import tobi.reinforcement.problems.gym.BoxBoxGym;
 import tobi.reinforcement.problems.gym.BoxDiscreteGym;
 
 import java.io.*;
@@ -34,9 +35,12 @@ public class Main {
     private static final boolean STOP_WHEN_FINISHED = true;
     private static final boolean VARIABLE_ENVIRONMENT = true;
     //    private static final double THRESHOLD_FITNESS_FINISHED = 3.9;
-    private static final double THRESHOLD_FITNESS_FINISHED = 0;
+//    private static final double THRESHOLD_FITNESS_FINISHED = 0;
 //    private static final double THRESHOLD_FITNESS_FINISHED = -0.158114;
 //    private static final double THRESHOLD_FITNESS_FINISHED = 500;
+
+//    BIPEDAL WALKER
+    private static final double THRESHOLD_FITNESS_FINISHED = 300;
 
     /**
      * Started with forward-fed network
@@ -96,13 +100,13 @@ public class Main {
         }
         System.out.println(Arrays.toString((args)));
 
-//        final String ENV_ID = "BipedalWalker-v3";
+        final String ENV_ID = "BipedalWalker-v3";
 //        final String ENV_ID = "LunarLanderContinuous-v2";
-//        try (BoxBoxGym PROBLEM = cmd.hasOption(INTERPRETER_ARG_KEY) ? new BoxBoxGym(ENV_ID, cmd.getOptionValue(INTERPRETER_ARG_KEY)) : new BoxBoxGym(ENV_ID)) {
+        try (BoxBoxGym PROBLEM = cmd.hasOption(INTERPRETER_ARG_KEY) ? new BoxBoxGym(ENV_ID, cmd.getOptionValue(INTERPRETER_ARG_KEY)) : new BoxBoxGym(ENV_ID)) {
 //        final String ENV_ID = "CartPole-v1";
 //        try (BoxDiscreteGym PROBLEM = cmd.hasOption(INTERPRETER_ARG_KEY) ? new BoxDiscreteGym(ENV_ID, cmd.getOptionValue(INTERPRETER_ARG_KEY)) : new BoxDiscreteGym(ENV_ID)) {
 //        XORProblem PROBLEM = new XORProblem();
-        Memorise PROBLEM = new Memorise(5);
+//        Memorise PROBLEM = new Memorise(5);
 //        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("Pong-ram-v0")) {
 //        try (BoxBoxGym PROBLEM = new BoxBoxGym("LunarLanderContinuous-v2")) {
 //        try (DiscreteBoxGym PROBLEM = new DiscreteBoxGym("HotterColder-v0")) {
@@ -121,10 +125,10 @@ public class Main {
 //            int SKIP_COUNTER = 0;
 //            int SKIPS = 0;
 //        for (int GENERATION_SIZE = 100; GENERATION_SIZE <= 12800; GENERATION_SIZE *= 2)
-        {
+//        {
             int GENERATION_SIZE = 150;
 //            int GENERATION_SIZE = (int) (100 * Math.pow(2, GENERATION_SIZE_I));
-            for (int PROGRAM_LOOPS = 0; PROGRAM_LOOPS < 10; PROGRAM_LOOPS++) {
+            for (int PROGRAM_LOOPS = 0; PROGRAM_LOOPS < 1000; PROGRAM_LOOPS++) {
                 ExecutorService exec = Executors.newCachedThreadPool();
                 final int PARENT_COUNT = (int) Math.ceil(GENERATION_SIZE * PARENT_RATIO);
 
@@ -166,7 +170,7 @@ public class Main {
 
                             MyRandom random = new MyRandom();
                             int seed = random.nextPositiveInt();
-                            int RUNS_ALLOWED = 100;
+                            int RUNS_ALLOWED = 1;
                             long[] RUN_GENERATIONS_TAKENS = new long[RUNS_ALLOWED];
                             int[] RUN_HIDDEN_NODE_COUNTS = new int[RUNS_ALLOWED];
                             long[] RUN_TIME_TAKENS = new long[RUNS_ALLOWED];
@@ -204,8 +208,8 @@ public class Main {
                                     ArrayList<Callable<Double>> tasks = new ArrayList<>();
                                     for (Network network : generation) {
                                         int finalSeed = seed;
-//                                        tasks.add(() -> PROBLEM.test(network, false, /*1,*/ finalSeed));
-                                        tasks.add(() -> PROBLEM.test(network, finalSeed));
+                                        tasks.add(() -> PROBLEM.test(network, false, /*1,*/ finalSeed));
+//                                        tasks.add(() -> PROBLEM.test(network, finalSeed));
 //                                        tasks.add(() -> PROBLEM.test(network));
                                     }
                                     List<Future<Double>> invokeAll = exec.invokeAll(tasks);
@@ -250,14 +254,15 @@ public class Main {
                                     fittestNetwork = generation[fittestIndex];
                                     int networkSize = fittestNetwork.getNeurons().size();
                                     String networkString = fittestNetwork.serialise();
-//                                    System.out.println(g + ": BEST FITNESS = " + maxFitness + "\t\thidden layer size = " + fittestNetwork.getHiddenLayerSize() + "\t\t" + networkString);
+                                    System.out.println(g + ": BEST FITNESS = " + maxFitness + "\t\thidden layer size = " + fittestNetwork.getHiddenLayerSize() + "\t\t" + networkString);
                                     if (!FINISHED && maxFitness >= THRESHOLD_FITNESS_FINISHED) {
                                         RUN_GENERATIONS_TAKEN = g;
                                         TIME_TAKEN = System.currentTimeMillis() - GENERATION_START;
 //                                    System.out.println("TIME_TAKEN = " + TIME_TAKEN);
-                                        System.out.println("fittestNetwork.getHiddenLayerSize() = " + fittestNetwork.getHiddenLayerSize());
-                                        System.out.println("fittestNetwork.getSynapseCount() = " + fittestNetwork.getSynapseCount());
-                                        System.out.println(fittestNetwork.serialise());
+//                                        System.out.println("maxFitness = " + maxFitness);
+                                        System.out.println("HiddenLayerSize = " + fittestNetwork.getHiddenLayerSize());
+                                        System.out.println("SynapseCount = " + fittestNetwork.getSynapseCount());
+//                                        System.out.println(fittestNetwork.serialise());
                                         FINISHED = true;
                                         if (STOP_WHEN_FINISHED) break;
                                     }
