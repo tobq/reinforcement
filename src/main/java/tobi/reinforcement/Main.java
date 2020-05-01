@@ -126,7 +126,7 @@ public class Main {
 //            int GENERATION_SIZE = (int) (100 * Math.pow(2, GENERATION_SIZE_I));
 //        for (int PROGRAM_LOOPS = 0; PROGRAM_LOOPS < 1000; PROGRAM_LOOPS++)
             {
-                ExecutorService exec = Executors.newFixedThreadPool(GENERATION_SIZE);
+                ExecutorService exec = Executors.newCachedThreadPool();
                 final int PARENT_COUNT = (int) Math.ceil(GENERATION_SIZE * PARENT_RATIO);
 
 //            for (int MURATION_RATE_I = 0; MURATION_RATE_I < 5; MURATION_RATE_I++)
