@@ -32,10 +32,10 @@ public class Main {
     private static final boolean CLONE_PARENTS = true;
 
     private static final boolean STOP_WHEN_FINISHED = true;
-    private static final double THRESHOLD_FITNESS_FINISHED = 0;
     private static final boolean VARIABLE_ENVIRONMENT = true;
     //    private static final double THRESHOLD_FITNESS_FINISHED = 3.9;
-//    private static final double THRESHOLD_FITNESS_FINISHED = -0.158114;
+//    private static final double THRESHOLD_FITNESS_FINISHED = 0;
+    private static final double THRESHOLD_FITNESS_FINISHED = -0.158114;
 
     /**
      * Started with forward-fed network
