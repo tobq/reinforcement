@@ -126,7 +126,7 @@ public class Main {
 //            int SKIPS = 0;
 //        for (int GENERATION_SIZE = 100; GENERATION_SIZE <= 12800; GENERATION_SIZE *= 2)
 //        {
-            int GENERATION_SIZE = 150;
+            int GENERATION_SIZE = 1500;
 //            int GENERATION_SIZE = (int) (100 * Math.pow(2, GENERATION_SIZE_I));
             for (int PROGRAM_LOOPS = 0; PROGRAM_LOOPS < 1000; PROGRAM_LOOPS++) {
                 ExecutorService exec = Executors.newCachedThreadPool();
@@ -136,7 +136,7 @@ public class Main {
 //                for (double MUTATION_RATE = 0.15; MUTATION_RATE < 0.3; MUTATION_RATE += 0.01) {
 //                    double MUTATION_RATE = 0.01 * Math.pow(2, MURATION_RATE_I);
                 {
-                    double MUTATION_RATE = 0.2;
+                    double MUTATION_RATE = 0.1;
 //                for (SortMethod SORT_METHOD : SortMethod.values()) {
                     {
                         SortMethod SORT_METHOD = SortMethod.TIE_MIN_NEURONS_SORT;
