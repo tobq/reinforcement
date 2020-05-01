@@ -15,12 +15,10 @@ public class Memorise {
         Random random = new Random(seed);
         network.reset();
 
-//        double[] string = {1,2,3,4};
         double[] string = new double[digits];
         double min = 0;
         double max = 10;
         for (int i = 0; i < digits; i++) {
-//            string[i] = 13;
             string[i] = random.nextDouble() * (min-max) - min;
         }
 

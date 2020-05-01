@@ -27,13 +27,13 @@ public class Main {
     //        public static final int GENERATION_SIZE = 10000;
 //    private static final double PARENT_RATIO = 1;
     private static final double PARENT_RATIO = 0.1;
-    private static final boolean ASEXUAL_REPRODUCTION = true;
+    private static final boolean ASEXUAL_REPRODUCTION = false;
     private static final boolean COPY_CROSSOVERS = true;
     private static final boolean CLONE_PARENTS = true;
 
     private static final boolean STOP_WHEN_FINISHED = true;
     private static final double THRESHOLD_FITNESS_FINISHED = 0;
-    private static final boolean VARIABLE_ENVIRONMENT = false;
+    private static final boolean VARIABLE_ENVIRONMENT = true;
     //    private static final double THRESHOLD_FITNESS_FINISHED = 3.9;
 //    private static final double THRESHOLD_FITNESS_FINISHED = -0.158114;
 
@@ -98,10 +98,10 @@ public class Main {
 //        final String ENV_ID = "BipedalWalker-v3";
 //        final String ENV_ID = "LunarLanderContinuous-v2";
 //        try (BoxBoxGym PROBLEM = cmd.hasOption(INTERPRETER_ARG_KEY) ? new BoxBoxGym(ENV_ID, cmd.getOptionValue(INTERPRETER_ARG_KEY)) : new BoxBoxGym(ENV_ID)) {
-//        final String ENV_ID = "CartPole-v1";
-//        try (BoxDiscreteGym PROBLEM = cmd.hasOption(INTERPRETER_ARG_KEY) ? new BoxDiscreteGym(ENV_ID, cmd.getOptionValue(INTERPRETER_ARG_KEY)) : new BoxDiscreteGym(ENV_ID)) {
+        final String ENV_ID = "CartPole-v1";
+        try (BoxDiscreteGym PROBLEM = cmd.hasOption(INTERPRETER_ARG_KEY) ? new BoxDiscreteGym(ENV_ID, cmd.getOptionValue(INTERPRETER_ARG_KEY)) : new BoxDiscreteGym(ENV_ID)) {
 //        XORProblem PROBLEM = new XORProblem();
-        Memorise PROBLEM = new Memorise(4);
+//        Memorise PROBLEM = new Memorise(5);
 //        try (BoxDiscreteGym PROBLEM = new BoxDiscreteGym("Pong-ram-v0")) {
 //        try (BoxBoxGym PROBLEM = new BoxBoxGym("LunarLanderContinuous-v2")) {
 //        try (DiscreteBoxGym PROBLEM = new DiscreteBoxGym("HotterColder-v0")) {
@@ -119,12 +119,11 @@ public class Main {
 
 //            int SKIP_COUNTER = 0;
 //            int SKIPS = 0;
-//        for (int GENERATION_SIZE_I = 0; GENERATION_SIZE_I < 7; GENERATION_SIZE_I++)
-        {
-//            int GENERATION_SIZE = 150;
-            int GENERATION_SIZE = 15000;
+//        for (int GENERATION_SIZE = 100; GENERATION_SIZE <= 12800; GENERATION_SIZE *= 2)
+//        {
+            int GENERATION_SIZE = 150;
 //            int GENERATION_SIZE = (int) (100 * Math.pow(2, GENERATION_SIZE_I));
-//        for (int PROGRAM_LOOPS = 0; PROGRAM_LOOPS < 1000; PROGRAM_LOOPS++)
+        for (int PROGRAM_LOOPS = 0; PROGRAM_LOOPS < 1000; PROGRAM_LOOPS++)
             {
                 ExecutorService exec = Executors.newCachedThreadPool();
                 final int PARENT_COUNT = (int) Math.ceil(GENERATION_SIZE * PARENT_RATIO);
@@ -205,8 +204,8 @@ public class Main {
                                     ArrayList<Callable<Double>> tasks = new ArrayList<>();
                                     for (Network network : generation) {
                                         int finalSeed = seed;
-//                                        tasks.add(() -> PROBLEM.test(network, false, /*1,*/ finalSeed));
-                                        tasks.add(() -> PROBLEM.test(network, finalSeed));
+                                        tasks.add(() -> PROBLEM.test(network, false, /*1,*/ finalSeed));
+//                                        tasks.add(() -> PROBLEM.test(network, finalSeed));
 //                                        tasks.add(() -> PROBLEM.test(network));
                                     }
                                     List<Future<Double>> invokeAll = exec.invokeAll(tasks);
@@ -252,7 +251,7 @@ public class Main {
                                     fittestNetwork = generation[fittestIndex];
                                     int networkSize = fittestNetwork.getNeurons().size();
                                     String networkString = fittestNetwork.serialise();
-                                    System.out.println(g + ": BEST FITNESS = " + maxFitness + "\t\thidden layer size = " + fittestNetwork.getHiddenLayerSize() + "\t\t" + networkString);
+//                                    System.out.println(g + ": BEST FITNESS = " + maxFitness + "\t\thidden layer size = " + fittestNetwork.getHiddenLayerSize() + "\t\t" + networkString);
                                     if (!FINISHED && maxFitness >= THRESHOLD_FITNESS_FINISHED) {
                                         RUN_GENERATIONS_TAKEN = g;
                                         TIME_TAKEN = System.currentTimeMillis() - GENERATION_START;
@@ -270,9 +269,11 @@ public class Main {
                                         for (int i = 0; i < PARENT_COUNT; i++)
                                             nextGen[i] = generation[order[i]].copy(MUTATION_RATE);
                                     }
+//                                    REST OF THE GENERATION
                                     for (int i = PARENT_COUNT; i < generation.length; i++) {
                                         if (ASEXUAL_REPRODUCTION) {
-                                            nextGen[i] = generation[order[i]].copy(MUTATION_RATE);
+                                            int randomIndex = Utils.logRandom(generation);
+                                            nextGen[i] = generation[randomIndex].copy(MUTATION_RATE);
                                         } else {
                                             int randomIndexA = Utils.logRandom(generation);
                                             int randomIndexB = Utils.logRandom(generation);
