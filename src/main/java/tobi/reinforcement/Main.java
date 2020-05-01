@@ -124,7 +124,7 @@ public class Main {
         {
             int GENERATION_SIZE = 150;
 //            int GENERATION_SIZE = (int) (100 * Math.pow(2, GENERATION_SIZE_I));
-            for (int PROGRAM_LOOPS = 0; PROGRAM_LOOPS < 1000; PROGRAM_LOOPS++) {
+            for (int PROGRAM_LOOPS = 0; PROGRAM_LOOPS < 10; PROGRAM_LOOPS++) {
                 ExecutorService exec = Executors.newCachedThreadPool();
                 final int PARENT_COUNT = (int) Math.ceil(GENERATION_SIZE * PARENT_RATIO);
 
@@ -166,7 +166,7 @@ public class Main {
 
                             MyRandom random = new MyRandom();
                             int seed = random.nextPositiveInt();
-                            int RUNS_ALLOWED = 1;
+                            int RUNS_ALLOWED = 100;
                             long[] RUN_GENERATIONS_TAKENS = new long[RUNS_ALLOWED];
                             int[] RUN_HIDDEN_NODE_COUNTS = new int[RUNS_ALLOWED];
                             long[] RUN_TIME_TAKENS = new long[RUNS_ALLOWED];
@@ -241,7 +241,6 @@ public class Main {
                                             c = Comparator
                                                     .comparingDouble((Integer a) -> fitnesses[a])
                                                     .reversed();
-
                                     }
 
                                     Arrays.sort(order, c);
@@ -256,6 +255,9 @@ public class Main {
                                         RUN_GENERATIONS_TAKEN = g;
                                         TIME_TAKEN = System.currentTimeMillis() - GENERATION_START;
 //                                    System.out.println("TIME_TAKEN = " + TIME_TAKEN);
+                                        System.out.println("fittestNetwork.getHiddenLayerSize() = " + fittestNetwork.getHiddenLayerSize());
+                                        System.out.println("fittestNetwork.getSynapseCount() = " + fittestNetwork.getSynapseCount());
+                                        System.out.println(fittestNetwork.serialise());
                                         FINISHED = true;
                                         if (STOP_WHEN_FINISHED) break;
                                     }
@@ -341,7 +343,7 @@ public class Main {
                                 hiddenSTDEV += Math.pow(taken - avghiddennodes, 2);
                             }
                             hiddenSTDEV = Math.sqrt(hiddenSTDEV / RUNS_ALLOWED);
-                            System.out.println("STDEV OF HIDDEN NODES USED: " + hiddenSTDEV + "\n\n\n");
+                            System.out.println("STDEV OF HIDDEN NODES USED: " + hiddenSTDEV);
                         }
                     }
                 }
