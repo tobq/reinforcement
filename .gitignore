@@ -3,3 +3,5 @@ build/
 .idea/
 15*.csv
 nohup.out
+PAPER TESTS
+training-outputs
